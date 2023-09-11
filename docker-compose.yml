@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  mongodb:
+    image: mongo
+    restart: always
+    volumes:
+      - pro-magnet-data:/data/db
+    ports:
+      - 27017:27017
+    env_file:
+      - ./.env
+  server:
+    image: phuctq32/pro-magnet
+    ports:
+      - 8080:8080
+    env_file:
+      - ./.env
+    depends_on:
+      - mongodb
+
+volumes:
+  pro-magnet-data:
