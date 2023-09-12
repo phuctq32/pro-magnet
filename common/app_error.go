@@ -55,7 +55,7 @@ func NewServerErr(err error) *AppError {
 
 func NewBadRequestErr(err error, msg ...string) *AppError {
 	message := err.Error()
-	if len(msg) == 0 {
+	if len(msg) > 0 {
 		message = msg[0]
 	}
 

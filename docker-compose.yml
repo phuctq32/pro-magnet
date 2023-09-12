@@ -7,15 +7,17 @@ services:
     volumes:
       - pro-magnet-data:/data/db
     ports:
-      - 27017:27017
+      - "27017:27017"
     env_file:
-      - ./.env
+      - ./docker.env
   server:
     image: phuctq32/pro-magnet
     ports:
-      - 8080:8080
+      - "8080:8080"
     env_file:
-      - ./.env
+      - ./docker.env
+    environment:
+      - ENV=production
     depends_on:
       - mongodb
 
