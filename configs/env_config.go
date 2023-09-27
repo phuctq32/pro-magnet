@@ -3,9 +3,7 @@ package configs
 import (
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
-	"os"
 	"reflect"
-	"strconv"
 )
 
 const (
@@ -13,35 +11,39 @@ const (
 	Production         = "production"
 )
 
-type EnvConfiguration interface {
-	GetPort() int
-	GetMongoConnectionString() string
-	GetMongoDBName() string
-}
-
 var EnvConfigs EnvConfiguration
 
-type envConfigs struct {
-	// app
-	Port int `mapstructure:"PORT"`
-
-	// mongodb
-	MongoConnStr string `mapstructure:"MONGO_CONN_STRING"`
-	MongoDBName  string `mapstructure:"MONGO_DATABASE_NAME"`
+type EnvConfiguration interface {
+	Port() int
+	MongoConnectionString() string
+	MongoDBName() string
+	RedisAddr() string
 }
 
-func LoadEnvConfigs(env string) {
-	if env == Development {
-		EnvConfigs = LoadConfigsFromEnvFile()
-	} else if env == Production {
-		EnvConfigs = LoadConfigsFromOS()
-	} else {
-		log.Fatal().Msg("invalid environment")
+type envConfigs struct {
+	env struct {
+		Port         int    `mapstructure:"PORT"`
+		MongoConnStr string `mapstructure:"MONGO_CONN_STRING"`
+		MongoDBName  string `mapstructure:"MONGO_DATABASE_NAME"`
+		RedisAddr    string `mapstructure:"REDIS_ADDR"`
 	}
 }
 
-func LoadConfigsFromEnvFile() EnvConfiguration {
-	var cfg envConfigs
+func LoadEnvConfigs(env string) {
+	cfg := new(envConfigs)
+
+	if env == Development {
+		cfg.LoadFromEnvFile()
+	} else if env == Production {
+		cfg.LoadConfigsFromOS()
+	} else {
+		log.Fatal().Msg("invalid environment")
+	}
+
+	EnvConfigs = cfg
+}
+
+func (cfg *envConfigs) LoadFromEnvFile() {
 	viper.AddConfigPath(".")
 	viper.SetConfigFile(".env")
 
@@ -49,49 +51,38 @@ func LoadConfigsFromEnvFile() EnvConfiguration {
 		log.Fatal().Err(err).Msg("cannot load environment variables from env file")
 	}
 
-	if err := viper.Unmarshal(&cfg); err != nil {
-		log.Fatal().Err(err).Msg("something went wrong while loading env")
+	if err := viper.Unmarshal(&cfg.env); err != nil {
+		log.Fatal().Err(err).Msg("unmarshal env error happened")
 	}
-
-	return &cfg
 }
 
-func LoadConfigsFromOS() EnvConfiguration {
-	var cfg envConfigs
-	v := reflect.ValueOf(&cfg).Elem()
-	t := v.Type()
-
-	for i := 0; i < v.NumField(); i++ {
+func (cfg *envConfigs) LoadConfigsFromOS() {
+	t := reflect.ValueOf(&cfg.env).Elem().Type()
+	for i := 0; i < t.NumField(); i++ {
 		if tagValue := t.Field(i).Tag.Get("mapstructure"); tagValue != "-" {
-			val := os.Getenv(tagValue)
-			if val == "" {
-				log.Fatal().Msgf("cannot get %v from env file", tagValue)
-			}
-
-			switch v.Field(i).Kind() {
-			case reflect.Int:
-				intVal, err := strconv.Atoi(val)
-				if err != nil {
-					log.Fatal().Msgf("cannot convert string to int %v", tagValue)
-				}
-				v.Field(i).SetInt(int64(intVal))
-			default:
-				v.Field(i).Set(reflect.ValueOf(val))
+			if err := viper.BindEnv(tagValue); err != nil {
+				log.Fatal().Err(err).Msgf("cannot bind env: %v", tagValue)
 			}
 		}
 	}
 
-	return &cfg
+	if err := viper.Unmarshal(&cfg.env); err != nil {
+		log.Fatal().Err(err).Msg("unmarshal env error happened")
+	}
 }
 
-func (cfg *envConfigs) GetPort() int {
-	return cfg.Port
+func (cfg *envConfigs) Port() int {
+	return cfg.env.Port
 }
 
-func (cfg *envConfigs) GetMongoConnectionString() string {
-	return cfg.MongoConnStr
+func (cfg *envConfigs) MongoConnectionString() string {
+	return cfg.env.MongoConnStr
 }
 
-func (cfg *envConfigs) GetMongoDBName() string {
-	return cfg.MongoDBName
+func (cfg *envConfigs) MongoDBName() string {
+	return cfg.env.MongoDBName
+}
+
+func (cfg *envConfigs) RedisAddr() string {
+	return cfg.env.RedisAddr
 }

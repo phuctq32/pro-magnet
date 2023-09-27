@@ -5,11 +5,18 @@ services:
     image: mongo
     restart: always
     volumes:
-      - pro-magnet-data:/data/db
+      - data:/data/db
     ports:
       - "27017:27017"
     env_file:
       - ./docker.env
+  redis:
+    image: redis:7.2-alpine3.18
+    restart: always
+    volumes:
+      - cache:/data
+    ports:
+      - "6379:6379"
   server:
     image: phuctq32/pro-magnet
     ports:
@@ -20,6 +27,8 @@ services:
       - ENV=production
     depends_on:
       - mongodb
+      - redis
 
 volumes:
-  pro-magnet-data:
+  data:
+  cache:
