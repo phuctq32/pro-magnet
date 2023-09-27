@@ -17,7 +17,11 @@ func Recover() gin.HandlerFunc {
 					appErr = common.NewServerErr(err.(error))
 				}
 
-				log.Error().Err(appErr).Msg(appErr.Log)
+				if gin.Mode() == gin.DebugMode {
+					panic(appErr)
+				} else {
+					log.Error().Err(appErr).Msg(appErr.Log)
+				}
 
 				c.AbortWithStatusJSON(appErr.StatusCode, appErr)
 

@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 	"time"
@@ -31,5 +32,6 @@ func Logger() gin.HandlerFunc {
 			Str("path", path).
 			Str("latency", latency.String()).
 			Msg("http request")
+		fmt.Printf("\n-------------------------------------------------------------------\n")
 	}
 }
