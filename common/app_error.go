@@ -2,7 +2,10 @@ package common
 
 import (
 	"fmt"
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
+	"pro-magnet/components/validator"
 )
 
 const (
@@ -10,16 +13,22 @@ const (
 	BadRequestErrKey          = "BAD_REQUEST"
 	NotFoundErrKey            = "NOT_FOUND"
 	NoPermissionErrKey        = "NO_PERMISSION"
+	ExistedErrKey             = "EXISTED"
+	ValidationErrKey          = "VALIDATION_FAILED"
+)
+
+var (
+	ErrNotFound = mongo.ErrNoDocuments.Error()
 )
 
 type AppError struct {
-	Success    bool   `json:"success"`
-	StatusCode int    `json:"status_code"`
-	Key        string `json:"error_key"`
-	Message    string `json:"message"`
-	Log        string `json:"-"`
-	Err        error  `json:"-"`
-	// ValidationErrs
+	Success        bool                        `json:"success"`
+	StatusCode     int                         `json:"statusCode"`
+	Key            string                      `json:"errorKey"`
+	Message        string                      `json:"message"`
+	Log            string                      `json:"-"`
+	Err            error                       `json:"-"`
+	ValidationErrs []validator.ValidationError `json:"validation_errors,omitempty"`
 }
 
 func (e *AppError) Error() string {
@@ -78,6 +87,16 @@ func NewNotFoundErr(entity string, err error) *AppError {
 	)
 }
 
+func NewExistedErr(entity string) *AppError {
+	return NewErrResponse(
+		http.StatusUnprocessableEntity,
+		ExistedErrKey,
+		fmt.Sprintf("%v already existed", entity),
+		fmt.Sprintf("%v already existed", entity),
+		errors.New(fmt.Sprintf("%v already existed", entity)),
+	)
+}
+
 func NewNoPermissionErr(err error) *AppError {
 	return NewErrResponse(
 		http.StatusUnprocessableEntity,
@@ -86,4 +105,14 @@ func NewNoPermissionErr(err error) *AppError {
 		err.Error(),
 		err,
 	)
+}
+
+func NewValidationErrors(errs []validator.ValidationError) *AppError {
+	return &AppError{
+		StatusCode:     http.StatusUnprocessableEntity,
+		Key:            ValidationErrKey,
+		Message:        fmt.Sprintf("field: '%s' error: %s", errs[0].Field, errs[0].Message),
+		Err:            &errs[0],
+		ValidationErrs: errs,
+	}
 }
