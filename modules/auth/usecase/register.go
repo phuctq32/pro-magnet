@@ -51,7 +51,7 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 	verifiedToken := hex.EncodeToString(b)
 
 	// set verified token to cache
-	if err = uc.authRedisRepo.SetVerifiedToken(ctx, verifiedToken, *userId); err != nil {
+	if err = uc.redisRepo.SetVerifiedToken(ctx, verifiedToken, *userId); err != nil {
 		return err
 	}
 

@@ -7,6 +7,7 @@ import (
 
 type AuthUseCase interface {
 	Register(ctx context.Context, data *authmodel.RegisterUser) error
+	Verify(ctx context.Context, verifiedToken string) error
 }
 
 type authHandler struct {

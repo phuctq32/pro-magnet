@@ -10,17 +10,19 @@ import (
 type UserRepository interface {
 	Create(ctx context.Context, data *usermodel.User) (*string, error)
 	CheckEmailExists(ctx context.Context, email string) error
+	SetEmailVerified(ctx context.Context, id string) error
 }
 
 type AuthRedisRepository interface {
 	SetVerifiedToken(ctx context.Context, token, userId string) error
+	GetVerifiedUserId(ctx context.Context, verifiedToken string) (*string, error)
 }
 
 type authUseCase struct {
-	userRepo      UserRepository
-	authRedisRepo AuthRedisRepository
-	hasher        hasher.Hasher
-	mailer        mailer.Mailer
+	userRepo  UserRepository
+	redisRepo AuthRedisRepository
+	hasher    hasher.Hasher
+	mailer    mailer.Mailer
 }
 
 func NewAuthUseCase(
@@ -30,9 +32,9 @@ func NewAuthUseCase(
 	mailer mailer.Mailer,
 ) *authUseCase {
 	return &authUseCase{
-		userRepo:      userRepo,
-		authRedisRepo: authRedisRepo,
-		hasher:        hasher,
-		mailer:        mailer,
+		userRepo:  userRepo,
+		redisRepo: authRedisRepo,
+		hasher:    hasher,
+		mailer:    mailer,
 	}
 }
