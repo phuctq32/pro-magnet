@@ -18,14 +18,30 @@ type EnvConfiguration interface {
 	MongoConnectionString() string
 	MongoDBName() string
 	RedisAddr() string
+	SendgridApiKey() string
+	SendgridFromEmail() string
+	SendgridVerifyEmailTemplateId() string
+	VerificationLink() string
 }
 
 type envConfigs struct {
 	env struct {
-		Port         int    `mapstructure:"PORT"`
+		// app
+		Port     int    `mapstructure:"PORT"`
+		FeDomain string `mapstructure:"FE_DOMAIN"`
+
+		// mongodb
 		MongoConnStr string `mapstructure:"MONGO_CONN_STRING"`
 		MongoDBName  string `mapstructure:"MONGO_DATABASE_NAME"`
-		RedisAddr    string `mapstructure:"REDIS_ADDR"`
+
+		// redis
+		RedisAddr string `mapstructure:"REDIS_ADDR"`
+
+		// sendgrid
+		SendGridApiKey                string `mapstructure:"SENDGRID_API_KEY"`
+		SendGridFromEmail             string `mapstructure:"FROM_EMAIL"`
+		SendGridVerifyEmailTemplateId string `mapstructure:"SENDGRID_VERIFY_TEMPlATE_ID"`
+		VerificationLink              string `mapstructure:"VERIFICATION_LINK"`
 	}
 }
 
@@ -85,4 +101,20 @@ func (cfg *envConfigs) MongoDBName() string {
 
 func (cfg *envConfigs) RedisAddr() string {
 	return cfg.env.RedisAddr
+}
+
+func (cfg *envConfigs) SendgridApiKey() string {
+	return cfg.env.SendGridApiKey
+}
+
+func (cfg *envConfigs) SendgridFromEmail() string {
+	return cfg.env.SendGridFromEmail
+}
+
+func (cfg *envConfigs) SendgridVerifyEmailTemplateId() string {
+	return cfg.env.SendGridVerifyEmailTemplateId
+}
+
+func (cfg *envConfigs) VerificationLink() string {
+	return cfg.env.VerificationLink
 }

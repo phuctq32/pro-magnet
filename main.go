@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
@@ -13,8 +12,10 @@ import (
 	"net/http"
 	"os"
 	"pro-magnet/components/appcontext"
+	"pro-magnet/components/validator"
 	"pro-magnet/configs"
 	"pro-magnet/middlewares"
+	"pro-magnet/routes"
 	"time"
 )
 
@@ -25,7 +26,6 @@ func main() {
 
 	// Load env
 	configs.LoadEnvConfigs(env)
-	log.Info().Interface("env", configs.EnvConfigs.MongoConnectionString()).Msg("")
 
 	// DB
 	db, cancel := connectMongoDB()
@@ -34,8 +34,11 @@ func main() {
 	// Redis Client
 	redisCli := connectRedisCli()
 
+	// Validator
+	appValidator := validator.NewValidator()
+
 	// Init AppContext
-	_ = appcontext.NewAppContext(db, redisCli)
+	appCtx := appcontext.NewAppContext(db, redisCli, appValidator)
 
 	if env == configs.Production {
 		gin.SetMode(gin.ReleaseMode)
@@ -43,19 +46,19 @@ func main() {
 
 	router := gin.New()
 
+	router.Use(middlewares.Logger())
 	if env == configs.Development {
 		router.Use(gin.Recovery())
 	}
 
-	router.Use(middlewares.Logger(), middlewares.Recover())
+	router.Use(middlewares.Recover())
 
 	router.GET("/ping", func(c *gin.Context) {
-		a := []int{1}
-		_ = a[2]
-
-		log.Debug().Err(errors.New("hello")).Msg("")
 		c.JSON(http.StatusOK, gin.H{"message": "OK"})
 	})
+
+	// setup routes
+	routes.Setup(appCtx, router)
 
 	err := router.Run(fmt.Sprintf(":%v", configs.EnvConfigs.Port()))
 	if err != nil {
