@@ -23,4 +23,6 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 
 	// setup routes
 	router.POST("/register", authHdl.Register(appCtx))
+	router.POST("/verify", authHdl.Verify(appCtx))
+	router.POST("/send-verification-email", authHdl.SendVerificationEmail(appCtx))
 }
