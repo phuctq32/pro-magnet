@@ -23,3 +23,7 @@ func (repo *userRepository) FindOne(ctx context.Context, filter map[string]inter
 
 	return &user, nil
 }
+
+func (repo *userRepository) FindByEmail(ctx context.Context, email string) (*usermodel.User, error) {
+	return repo.FindOne(ctx, map[string]interface{}{"email": email})
+}

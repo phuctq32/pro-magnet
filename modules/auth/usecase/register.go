@@ -2,12 +2,7 @@ package authuc
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
-	"github.com/rs/zerolog/log"
 	"pro-magnet/common"
-	"pro-magnet/components/mailer"
-	"pro-magnet/configs"
 	authmodel "pro-magnet/modules/auth/model"
 	usermodel "pro-magnet/modules/user/model"
 	"time"
@@ -41,34 +36,11 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 	if err != nil {
 		return err
 	}
+	newUser.Id = userId
 
-	// generate verified token
-	b := make([]byte, 32)
-	_, err = rand.Read(b)
-	if err != nil {
+	if err = uc.sendVerificationEmail(ctx, newUser); err != nil {
 		return common.NewServerErr(err)
 	}
-	verifiedToken := hex.EncodeToString(b)
 
-	// set verified token to cache
-	if err = uc.redisRepo.SetVerifiedToken(ctx, verifiedToken, *userId); err != nil {
-		return err
-	}
-
-	// send email verification
-	emailConfig := mailer.NewEmailConfigWithDynamicTemplate(
-		configs.EnvConfigs.SendgridFromEmail(),
-		newUser.Email,
-		"Verify Email",
-		configs.EnvConfigs.SendgridVerifyEmailTemplateId(),
-		map[string]interface{}{
-			"username": newUser.Name,
-			"url":      configs.EnvConfigs.VerificationLink() + verifiedToken,
-		},
-	)
-	log.Debug().Msg("sending verification email...")
-	if err = uc.mailer.Send(emailConfig); err != nil {
-		return common.NewServerErr(err)
-	}
 	return nil
 }

@@ -1,8 +1,8 @@
 package authapi
 
 import (
-	"errors"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"net/http"
 	"pro-magnet/common"
 	"pro-magnet/components/appcontext"

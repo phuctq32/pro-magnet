@@ -2,6 +2,7 @@ package authuc
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"pro-magnet/common"
 )
 
@@ -11,7 +12,7 @@ func (uc *authUseCase) Verify(ctx context.Context, verifiedToken string) error {
 		return err
 	}
 	if userId == nil {
-		return common.NewBadRequestErr(err, "invalid verified token")
+		return common.NewBadRequestErr(errors.New("invalid token"))
 	}
 
 	if err = uc.userRepo.SetEmailVerified(ctx, *userId); err != nil {
