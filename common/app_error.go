@@ -108,11 +108,16 @@ func NewNoPermissionErr(err error) *AppError {
 	)
 }
 
-func NewUnauthorizedErr(err error) *AppError {
+func NewUnauthorizedErr(err error, msg ...string) *AppError {
+	message := err.Error()
+	if len(msg) > 0 {
+		message = msg[0]
+	}
+
 	return NewErrResponse(
 		http.StatusUnauthorized,
 		UnauthorizedErrKey,
-		err.Error(),
+		message,
 		err.Error(),
 		err,
 	)

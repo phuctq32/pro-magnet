@@ -10,6 +10,7 @@ type AuthUseCase interface {
 	Verify(ctx context.Context, verifiedToken string) error
 	SendVerificationEmail(ctx context.Context, email string) error
 	Login(ctx context.Context, data *authmodel.LoginUser) (*authmodel.TokenPair, error)
+	RefreshAccessToken(ctx context.Context, refreshToken string) (*string, error)
 }
 
 type authHandler struct {

@@ -1,7 +1,6 @@
 package jwt
 
 import (
-	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/pkg/errors"
 	"time"
@@ -39,13 +38,15 @@ func (jp *jwtProvider) Validate(tokenStr string, secretKey string) (*Payload, er
 	token, err := jwt.ParseWithClaims(tokenStr, &claims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(secretKey), nil
 	})
-	if err != nil {
-		return nil, fmt.Errorf("can not parse token %w", err)
+	// In this parse function, error returned is nil only if token.Valid == false
+	// If error occurred, token must be invalid
+	if err != nil || !token.Valid {
+		return nil, err
 	}
 
 	claims, ok := token.Claims.(*claims)
-	if !token.Valid || !ok {
-		return nil, errors.New("invalid token")
+	if !ok {
+		return nil, errors.New("can not assert token claims")
 	}
 
 	return &claims.Payload, nil

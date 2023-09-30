@@ -16,7 +16,6 @@ func (hdl *authHandler) Register(appCtx appcontext.AppContext) gin.HandlerFunc {
 			panic(common.NewBadRequestErr(err))
 		}
 
-		// validate
 		if errs := appCtx.Validator().Validate(&data); errs != nil {
 			panic(common.NewValidationErrors(errs))
 		}

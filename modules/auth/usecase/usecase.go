@@ -13,6 +13,7 @@ type UserRepository interface {
 	CheckEmailExists(ctx context.Context, email string) error
 	SetEmailVerified(ctx context.Context, id string) error
 	FindByEmail(ctx context.Context, email string) (*usermodel.User, error)
+	FindById(ctx context.Context, id string) (*usermodel.User, error)
 }
 
 type AuthRedisRepository interface {

@@ -5,7 +5,6 @@ import (
 	"github.com/pkg/errors"
 	"pro-magnet/common"
 	"pro-magnet/components/jwt"
-	"pro-magnet/configs"
 	authmodel "pro-magnet/modules/auth/model"
 )
 
@@ -24,21 +23,12 @@ func (uc *authUseCase) Login(ctx context.Context, data *authmodel.LoginUser) (*a
 	}
 
 	tokenPayload := &jwt.Payload{UserId: *user.Id}
-	accessToken, err := uc.tokenProvider.Generate(
-		tokenPayload,
-		configs.EnvConfigs.AccessSecret(),
-		uc.atExpiry,
-	)
+	accessToken, err := uc.tokenProvider.Generate(tokenPayload, uc.atSecret, uc.atExpiry)
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := uc.tokenProvider.Generate(
-		tokenPayload,
-		configs.EnvConfigs.RefreshSecret(),
-		uc.rtExpiry,
-	)
-
+	refreshToken, err := uc.tokenProvider.Generate(tokenPayload, uc.rtSecret, uc.rtExpiry)
 	if err != nil {
 		return nil, err
 	}

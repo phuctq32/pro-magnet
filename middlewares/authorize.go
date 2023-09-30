@@ -22,7 +22,7 @@ func Authorize(appCtx appcontext.AppContext) gin.HandlerFunc {
 
 		payload, err := tokenProvider.Validate(parts[1], configs.EnvConfigs.AccessSecret())
 		if err != nil {
-			panic(common.NewBadRequestErr(err))
+			panic(common.NewUnauthorizedErr(err, "invalid token"))
 		}
 
 		userRepo := userrepo.NewUserRepository(appCtx.DBConnection())

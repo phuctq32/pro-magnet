@@ -30,25 +30,25 @@ type EnvConfiguration interface {
 
 type envConfigs struct {
 	env struct {
-		// app
+		// App
 		Port               int    `mapstructure:"PORT"`
 		AccessSecret       string `mapstructure:"ACCESS_SECRET"`
 		RefreshSecret      string `mapstructure:"REFRESH_SECRET"`
 		AccessTokenExpiry  int    `mapstructure:"ACCESS_TOKEN_EXPIRY"`
 		RefreshTokenExpiry int    `mapstructure:"REFRESH_TOKEN_EXPIRY"`
 
-		// mongodb
+		// MongoDB
 		MongoConnStr string `mapstructure:"MONGO_CONN_STRING"`
 		MongoDBName  string `mapstructure:"MONGO_DATABASE_NAME"`
 
-		// redis
+		// Redis
 		RedisAddr string `mapstructure:"REDIS_ADDR"`
 
-		// sendgrid
+		// Sendgrid
 		SendGridApiKey                string `mapstructure:"SENDGRID_API_KEY"`
 		SendGridFromEmail             string `mapstructure:"FROM_EMAIL"`
 		SendGridVerifyEmailTemplateId string `mapstructure:"SENDGRID_VERIFY_TEMPlATE_ID"`
-		VerificationURL               string `mapstructure:"VERIFICATION_LINK"`
+		VerificationURL               string `mapstructure:"VERIFICATION_URL"`
 	}
 }
 

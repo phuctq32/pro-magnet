@@ -9,7 +9,7 @@ import (
 )
 
 func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUser) error {
-	// use case should be in a transaction
+	// Should be in a transaction
 	if err := uc.userRepo.CheckEmailExists(ctx, data.Email); err != nil {
 		return err
 	}

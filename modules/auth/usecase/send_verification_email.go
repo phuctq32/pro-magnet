@@ -30,7 +30,7 @@ func (uc *authUseCase) SendVerificationEmail(ctx context.Context, email string) 
 }
 
 func (uc *authUseCase) sendVerificationEmail(ctx context.Context, user *usermodel.User) error {
-	// generate verified token
+	// Generate verified token
 	b := make([]byte, 32)
 	_, err := rand.Read(b)
 	if err != nil {
@@ -38,12 +38,12 @@ func (uc *authUseCase) sendVerificationEmail(ctx context.Context, user *usermode
 	}
 	verifiedToken := hex.EncodeToString(b)
 
-	// set verified token to cache
+	// Set verified token to cache
 	if err = uc.redisRepo.SetVerifiedToken(ctx, verifiedToken, *user.Id); err != nil {
 		return err
 	}
 
-	// send email verification
+	// Send email verification
 	emailConfig := mailer.NewEmailConfigWithDynamicTemplate(
 		configs.EnvConfigs.SendgridFromEmail(),
 		user.Email,

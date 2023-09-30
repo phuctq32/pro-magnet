@@ -14,7 +14,7 @@ import (
 )
 
 func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
-	// setup dependencies
+	// Setup dependencies
 	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
 	authRedisRepo := authrepo.NewAuthRedisRepository(appCtx.RedisClient())
 	hasher := hasher2.NewBcryptHash(10)
@@ -35,12 +35,13 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 
 	authHdl := authapi.NewAuthHandler(authUC)
 
-	// setup routes
+	// Setup routes
 	authRouter := router.Group("/auth")
 	{
 		authRouter.POST("/register", authHdl.Register(appCtx))
 		authRouter.POST("/verify", authHdl.Verify(appCtx))
 		authRouter.POST("/send-verification-email", authHdl.SendVerificationEmail(appCtx))
 		authRouter.POST("/login", authHdl.Login(appCtx))
+		authRouter.POST("/refresh", authHdl.Refresh(appCtx))
 	}
 }

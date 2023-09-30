@@ -18,7 +18,7 @@ func NewValidator() Validator {
 	var v validator
 	v.validator = validator2.New()
 
-	// get json tag value
+	// Get json tag value
 	v.validator.RegisterTagNameFunc(func(fld reflect.StructField) string {
 		name := strings.SplitN(fld.Tag.Get("json"), ",", 2)[0]
 
