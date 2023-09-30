@@ -51,7 +51,7 @@ func (uc *authUseCase) sendVerificationEmail(ctx context.Context, user *usermode
 		configs.EnvConfigs.SendgridVerifyEmailTemplateId(),
 		map[string]interface{}{
 			"username": user.Name,
-			"url":      configs.EnvConfigs.VerificationLink() + verifiedToken,
+			"url":      configs.EnvConfigs.VerificationURL() + verifiedToken,
 		},
 	)
 

@@ -12,6 +12,7 @@ const (
 	InternalErrKey     string = "INTERNAL_SERVER_ERROR"
 	BadRequestErrKey          = "BAD_REQUEST"
 	NotFoundErrKey            = "NOT_FOUND"
+	UnauthorizedErrKey        = "UNAUTHORIZED"
 	NoPermissionErrKey        = "NO_PERMISSION"
 	ExistedErrKey             = "EXISTED"
 	ValidationErrKey          = "VALIDATION_FAILED"
@@ -28,7 +29,7 @@ type AppError struct {
 	Message        string                      `json:"message"`
 	Log            string                      `json:"-"`
 	Err            error                       `json:"-"`
-	ValidationErrs []validator.ValidationError `json:"validation_errors,omitempty"`
+	ValidationErrs []validator.ValidationError `json:"validationErrors,omitempty"`
 }
 
 func (e *AppError) Error() string {
@@ -99,9 +100,19 @@ func NewExistedErr(entity string) *AppError {
 
 func NewNoPermissionErr(err error) *AppError {
 	return NewErrResponse(
-		http.StatusUnprocessableEntity,
+		http.StatusForbidden,
 		NoPermissionErrKey,
 		"access denied",
+		err.Error(),
+		err,
+	)
+}
+
+func NewUnauthorizedErr(err error) *AppError {
+	return NewErrResponse(
+		http.StatusUnauthorized,
+		UnauthorizedErrKey,
+		err.Error(),
 		err.Error(),
 		err,
 	)

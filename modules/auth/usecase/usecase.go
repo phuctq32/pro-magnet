@@ -3,6 +3,7 @@ package authuc
 import (
 	"context"
 	"pro-magnet/components/hasher"
+	"pro-magnet/components/jwt"
 	"pro-magnet/components/mailer"
 	usermodel "pro-magnet/modules/user/model"
 )
@@ -20,10 +21,15 @@ type AuthRedisRepository interface {
 }
 
 type authUseCase struct {
-	userRepo  UserRepository
-	redisRepo AuthRedisRepository
-	hasher    hasher.Hasher
-	mailer    mailer.Mailer
+	userRepo      UserRepository
+	redisRepo     AuthRedisRepository
+	hasher        hasher.Hasher
+	mailer        mailer.Mailer
+	tokenProvider jwt.TokenProvider
+	atSecret      string
+	rtSecret      string
+	atExpiry      int
+	rtExpiry      int
 }
 
 func NewAuthUseCase(
@@ -31,11 +37,21 @@ func NewAuthUseCase(
 	authRedisRepo AuthRedisRepository,
 	hasher hasher.Hasher,
 	mailer mailer.Mailer,
+	tokenProvider jwt.TokenProvider,
+	atSecret string,
+	rtSecret string,
+	atExpiry int,
+	rtExpiry int,
 ) *authUseCase {
 	return &authUseCase{
-		userRepo:  userRepo,
-		redisRepo: authRedisRepo,
-		hasher:    hasher,
-		mailer:    mailer,
+		userRepo:      userRepo,
+		redisRepo:     authRedisRepo,
+		hasher:        hasher,
+		mailer:        mailer,
+		tokenProvider: tokenProvider,
+		atSecret:      atSecret,
+		rtSecret:      rtSecret,
+		atExpiry:      atExpiry,
+		rtExpiry:      rtExpiry,
 	}
 }

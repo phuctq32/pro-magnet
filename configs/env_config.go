@@ -21,14 +21,21 @@ type EnvConfiguration interface {
 	SendgridApiKey() string
 	SendgridFromEmail() string
 	SendgridVerifyEmailTemplateId() string
-	VerificationLink() string
+	VerificationURL() string
+	AccessSecret() string
+	RefreshSecret() string
+	AccessTokenExpiry() int
+	RefreshTokenExpiry() int
 }
 
 type envConfigs struct {
 	env struct {
 		// app
-		Port     int    `mapstructure:"PORT"`
-		FeDomain string `mapstructure:"FE_DOMAIN"`
+		Port               int    `mapstructure:"PORT"`
+		AccessSecret       string `mapstructure:"ACCESS_SECRET"`
+		RefreshSecret      string `mapstructure:"REFRESH_SECRET"`
+		AccessTokenExpiry  int    `mapstructure:"ACCESS_TOKEN_EXPIRY"`
+		RefreshTokenExpiry int    `mapstructure:"REFRESH_TOKEN_EXPIRY"`
 
 		// mongodb
 		MongoConnStr string `mapstructure:"MONGO_CONN_STRING"`
@@ -41,7 +48,7 @@ type envConfigs struct {
 		SendGridApiKey                string `mapstructure:"SENDGRID_API_KEY"`
 		SendGridFromEmail             string `mapstructure:"FROM_EMAIL"`
 		SendGridVerifyEmailTemplateId string `mapstructure:"SENDGRID_VERIFY_TEMPlATE_ID"`
-		VerificationLink              string `mapstructure:"VERIFICATION_LINK"`
+		VerificationURL               string `mapstructure:"VERIFICATION_LINK"`
 	}
 }
 
@@ -115,6 +122,22 @@ func (cfg *envConfigs) SendgridVerifyEmailTemplateId() string {
 	return cfg.env.SendGridVerifyEmailTemplateId
 }
 
-func (cfg *envConfigs) VerificationLink() string {
-	return cfg.env.VerificationLink
+func (cfg *envConfigs) VerificationURL() string {
+	return cfg.env.VerificationURL
+}
+
+func (cfg *envConfigs) AccessSecret() string {
+	return cfg.env.AccessSecret
+}
+
+func (cfg *envConfigs) RefreshSecret() string {
+	return cfg.env.RefreshSecret
+}
+
+func (cfg *envConfigs) AccessTokenExpiry() int {
+	return cfg.env.AccessTokenExpiry
+}
+
+func (cfg *envConfigs) RefreshTokenExpiry() int {
+	return cfg.env.RefreshTokenExpiry
 }

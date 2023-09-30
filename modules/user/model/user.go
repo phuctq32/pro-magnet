@@ -16,3 +16,7 @@ type User struct {
 	PhoneNumber string    `json:"phoneNumber" bson:"phoneNumber"`
 	Birthday    time.Time `json:"birthday" bson:"birthday"`
 }
+
+func (u *User) UserId() string {
+	return *u.Id
+}
