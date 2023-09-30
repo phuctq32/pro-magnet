@@ -8,10 +8,9 @@ import (
 	authmodel "pro-magnet/modules/auth/model"
 )
 
-func (hdl *authHandler) Register(appCtx appcontext.AppContext) gin.HandlerFunc {
+func (hdl *authHandler) Login(appCtx appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var data authmodel.RegisterUser
-
+		var data authmodel.LoginUser
 		if err := c.ShouldBind(&data); err != nil {
 			panic(common.NewBadRequestErr(err))
 		}
@@ -20,10 +19,11 @@ func (hdl *authHandler) Register(appCtx appcontext.AppContext) gin.HandlerFunc {
 			panic(common.NewValidationErrors(errs))
 		}
 
-		if err := hdl.uc.Register(c.Request.Context(), &data); err != nil {
+		tokenPair, err := hdl.uc.Login(c.Request.Context(), &data)
+		if err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusCreated, common.NewResponse("created user successfully", nil))
+		c.JSON(http.StatusOK, common.NewResponse("", tokenPair))
 	}
 }

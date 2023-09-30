@@ -11,7 +11,7 @@ func Logger() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		startTime := time.Now()
 
-		// handler
+		// Handler
 		c.Next()
 
 		latency := time.Since(startTime)

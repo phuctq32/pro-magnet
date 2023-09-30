@@ -3,6 +3,7 @@ package authuc
 import (
 	"context"
 	"pro-magnet/components/hasher"
+	"pro-magnet/components/jwt"
 	"pro-magnet/components/mailer"
 	usermodel "pro-magnet/modules/user/model"
 )
@@ -12,6 +13,7 @@ type UserRepository interface {
 	CheckEmailExists(ctx context.Context, email string) error
 	SetEmailVerified(ctx context.Context, id string) error
 	FindByEmail(ctx context.Context, email string) (*usermodel.User, error)
+	FindById(ctx context.Context, id string) (*usermodel.User, error)
 }
 
 type AuthRedisRepository interface {
@@ -20,10 +22,15 @@ type AuthRedisRepository interface {
 }
 
 type authUseCase struct {
-	userRepo  UserRepository
-	redisRepo AuthRedisRepository
-	hasher    hasher.Hasher
-	mailer    mailer.Mailer
+	userRepo      UserRepository
+	redisRepo     AuthRedisRepository
+	hasher        hasher.Hasher
+	mailer        mailer.Mailer
+	tokenProvider jwt.TokenProvider
+	atSecret      string
+	rtSecret      string
+	atExpiry      int
+	rtExpiry      int
 }
 
 func NewAuthUseCase(
@@ -31,11 +38,21 @@ func NewAuthUseCase(
 	authRedisRepo AuthRedisRepository,
 	hasher hasher.Hasher,
 	mailer mailer.Mailer,
+	tokenProvider jwt.TokenProvider,
+	atSecret string,
+	rtSecret string,
+	atExpiry int,
+	rtExpiry int,
 ) *authUseCase {
 	return &authUseCase{
-		userRepo:  userRepo,
-		redisRepo: authRedisRepo,
-		hasher:    hasher,
-		mailer:    mailer,
+		userRepo:      userRepo,
+		redisRepo:     authRedisRepo,
+		hasher:        hasher,
+		mailer:        mailer,
+		tokenProvider: tokenProvider,
+		atSecret:      atSecret,
+		rtSecret:      rtSecret,
+		atExpiry:      atExpiry,
+		rtExpiry:      rtExpiry,
 	}
 }
