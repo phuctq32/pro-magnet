@@ -1,4 +1,4 @@
-package wstransport
+package wsapi
 
 import (
 	"github.com/gin-gonic/gin"

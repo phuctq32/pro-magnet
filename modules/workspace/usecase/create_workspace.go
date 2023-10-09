@@ -1,10 +1,9 @@
-package wrkspusecase
+package wsuc
 
 import (
 	"context"
 	"pro-magnet/common"
 	wrkspmodel "pro-magnet/modules/workspace/model"
-	"time"
 )
 
 func (uc *workspaceUseCase) CreateWorkspace(
@@ -20,14 +19,9 @@ func (uc *workspaceUseCase) CreateWorkspace(
 		return nil, common.NewBadRequestErr(wrkspmodel.ErrExistedWorkspace)
 	}
 
-	now := time.Now()
-	newWs := &wrkspmodel.Workspace{
-		CreatedAt: now,
-		UpdatedAt: now,
-		Name:      data.Name,
-		UserId:    userId,
-		Image:     wrkspmodel.DefaultImageUrl,
-	}
+	data.OwnerUserId = userId
+	data.MemberIds = append(data.MemberIds, userId)
+	data.Image = wrkspmodel.DefaultImageUrl
 
-	return uc.wsRepo.Create(ctx, newWs)
+	return uc.wsRepo.Create(ctx, data)
 }

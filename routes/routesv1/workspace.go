@@ -5,14 +5,14 @@ import (
 	"pro-magnet/components/appcontext"
 	"pro-magnet/middlewares"
 	"pro-magnet/modules/workspace/repository"
-	"pro-magnet/modules/workspace/transport"
-	wrkspusecase "pro-magnet/modules/workspace/usecase"
+	"pro-magnet/modules/workspace/transport/api"
+	wsuc "pro-magnet/modules/workspace/usecase"
 )
 
 func NewWorkspaceRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	wsRepo := wsrepo.NewWorkspaceRepository(appCtx.DBConnection())
-	wsUC := wrkspusecase.NewWorkspaceUseCase(wsRepo)
-	wsHdl := wstransport.NewWorkspaceHandler(wsUC)
+	wsUC := wsuc.NewWorkspaceUseCase(wsRepo)
+	wsHdl := wsapi.NewWorkspaceHandler(wsUC)
 
 	wsRouter := router.Group("/workspaces", middlewares.Authorize(appCtx))
 	{
