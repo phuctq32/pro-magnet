@@ -9,4 +9,5 @@ import (
 func Setup(appCtx appcontext.AppContext, engine *gin.Engine) {
 	v1 := engine.Group("api/v1")
 	routesv1.NewAuthRouter(appCtx, v1)
+	routesv1.NewWorkspaceRouter(appCtx, v1)
 }
