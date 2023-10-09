@@ -19,7 +19,7 @@ const (
 )
 
 var (
-	ErrNotFound = mongo.ErrNoDocuments.Error()
+	ErrNotFound = mongo.ErrNoDocuments
 )
 
 type AppError struct {
@@ -79,10 +79,11 @@ func NewBadRequestErr(err error, msg ...string) *AppError {
 }
 
 func NewNotFoundErr(entity string, err error) *AppError {
+	msg := fmt.Sprintf("%v not found", entity)
 	return NewErrResponse(
 		http.StatusNotFound,
 		NotFoundErrKey,
-		fmt.Sprintf("%v not found", entity),
+		msg,
 		err.Error(),
 		err,
 	)

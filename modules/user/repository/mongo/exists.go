@@ -10,7 +10,7 @@ func (repo *userRepository) Exists(ctx context.Context, filter map[string]interf
 	_, err := repo.FindOne(ctx, filter)
 	if err == nil {
 		return common.NewExistedErr("user")
-	} else if err.Error() != common.ErrNotFound {
+	} else if err.Error() != common.ErrNotFound.Error() {
 		return err
 	}
 
