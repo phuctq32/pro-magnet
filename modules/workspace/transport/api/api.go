@@ -1,4 +1,4 @@
-package wstransport
+package wsapi
 
 import (
 	"context"

@@ -1,4 +1,4 @@
-package wrkspusecase
+package wsuc
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 )
 
 type WorkspaceRepository interface {
-	Create(context.Context, *wsmodel.Workspace) (*wsmodel.Workspace, error)
+	Create(context.Context, *wsmodel.WorkspaceCreation) (*wsmodel.Workspace, error)
 	FindByName(ctx context.Context, name string) (*wsmodel.Workspace, error)
 }
 
