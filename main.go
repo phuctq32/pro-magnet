@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"pro-magnet/components/appcontext"
+	"pro-magnet/components/asyncgroup"
 	"pro-magnet/components/validator"
 	"pro-magnet/configs"
 	"pro-magnet/middlewares"
@@ -37,8 +38,12 @@ func main() {
 	// Validator
 	appValidator := validator.NewValidator()
 
+	// Async Group
+	asyncg, agCancel := asyncgroup.New(10000)
+	defer agCancel()
+
 	// Init AppContext
-	appCtx := appcontext.NewAppContext(db, redisCli, appValidator)
+	appCtx := appcontext.NewAppContext(db, redisCli, appValidator, asyncg)
 
 	if env == configs.Production {
 		gin.SetMode(gin.ReleaseMode)

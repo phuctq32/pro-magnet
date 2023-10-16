@@ -10,45 +10,32 @@ func (uc *boardUseCase) CreateBoard(
 	ctx context.Context,
 	data *boardmodel.BoardCreation,
 ) (*boardmodel.Board, error) {
-	errCh := make(chan error, 2)
-
-	go func() {
-		// Board name must be not existed
+	checkBoardNameExistedTask := func(ctx context.Context) error {
 		ok, err := uc.boardRepo.ExistsInWorkspace(ctx, data.WorkspaceId)
 		if err != nil {
-			errCh <- err
-		} else if ok {
-			errCh <- boardmodel.ErrExistedBoard
-		} else {
-			errCh <- nil
+			return err
 		}
-	}()
+		if ok {
+			return boardmodel.ErrExistedBoard
+		}
+		return nil
+	}
 
-	go func() {
-		// Check if board admin is a workspace member
+	checkBoardAdIsWorkspaceMember := func(ctx context.Context) error {
 		wsMemberIds, err := uc.wsRepo.GetMemberIds(ctx, data.WorkspaceId)
 		if err != nil {
-			errCh <- err
-			return
+			return err
 		}
 		if !slices.Contains(wsMemberIds, data.UserId) {
-			errCh <- boardmodel.ErrIsNotMemberOfWorkspace
-			return
+			return boardmodel.ErrIsNotMemberOfWorkspace
 		}
-		errCh <- nil
-	}()
-
-	var err error
-	for i := 0; i < 2; i++ {
-		e := <-errCh
-		if err != nil {
-			continue
-		} else if e != nil {
-			err = e
-		}
+		return nil
 	}
-	close(errCh)
-	if err != nil {
+
+	if err := uc.asyncg.Process(ctx,
+		checkBoardNameExistedTask,
+		checkBoardAdIsWorkspaceMember,
+	); err != nil {
 		return nil, err
 	}
 

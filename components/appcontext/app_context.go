@@ -3,6 +3,7 @@ package appcontext
 import (
 	"github.com/redis/go-redis/v9"
 	"go.mongodb.org/mongo-driver/mongo"
+	"pro-magnet/components/asyncgroup"
 	"pro-magnet/components/validator"
 )
 
@@ -10,34 +11,42 @@ type AppContext interface {
 	DBConnection() *mongo.Database
 	RedisClient() *redis.Client
 	Validator() validator.Validator
+	AsyncGroup() asyncgroup.AsyncGroup
 }
 
-type appCxt struct {
+type appContext struct {
 	mongodb   *mongo.Database
 	redisCli  *redis.Client
 	validator validator.Validator
+	asyncg    asyncgroup.AsyncGroup
 }
 
 func NewAppContext(
 	db *mongo.Database,
 	redisCli *redis.Client,
 	validator validator.Validator,
+	asyncg asyncgroup.AsyncGroup,
 ) AppContext {
-	return &appCxt{
+	return &appContext{
 		mongodb:   db,
 		redisCli:  redisCli,
 		validator: validator,
+		asyncg:    asyncg,
 	}
 }
 
-func (appCtx *appCxt) DBConnection() *mongo.Database {
+func (appCtx *appContext) DBConnection() *mongo.Database {
 	return appCtx.mongodb
 }
 
-func (appCtx *appCxt) RedisClient() *redis.Client {
+func (appCtx *appContext) RedisClient() *redis.Client {
 	return appCtx.redisCli
 }
 
-func (appCtx *appCxt) Validator() validator.Validator {
+func (appCtx *appContext) Validator() validator.Validator {
 	return appCtx.validator
+}
+
+func (appCtx *appContext) AsyncGroup() asyncgroup.AsyncGroup {
+	return appCtx.asyncg
 }

@@ -2,6 +2,7 @@ package boarduc
 
 import (
 	"context"
+	"pro-magnet/components/asyncgroup"
 	boardmodel "pro-magnet/modules/board/model"
 )
 
@@ -17,14 +18,17 @@ type WorkspaceRepository interface {
 type boardUseCase struct {
 	boardRepo BoardRepository
 	wsRepo    WorkspaceRepository
+	asyncg    asyncgroup.AsyncGroup
 }
 
 func NewBoardUseCase(
 	boardRepo BoardRepository,
 	wsRepo WorkspaceRepository,
+	asyncg asyncgroup.AsyncGroup,
 ) *boardUseCase {
 	return &boardUseCase{
 		boardRepo: boardRepo,
 		wsRepo:    wsRepo,
+		asyncg:    asyncg,
 	}
 }
