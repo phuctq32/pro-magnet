@@ -26,6 +26,11 @@ type EnvConfiguration interface {
 	RefreshSecret() string
 	AccessTokenExpiry() int
 	RefreshTokenExpiry() int
+	S3BucketName() string
+	S3AccessKey() string
+	S3SecretKey() string
+	S3Region() string
+	S3Domain() string
 }
 
 type envConfigs struct {
@@ -49,6 +54,13 @@ type envConfigs struct {
 		SendGridFromEmail             string `mapstructure:"FROM_EMAIL"`
 		SendGridVerifyEmailTemplateId string `mapstructure:"SENDGRID_VERIFY_TEMPlATE_ID"`
 		VerificationURL               string `mapstructure:"VERIFICATION_URL"`
+
+		// AWS S3
+		S3BucketName string `mapstructure:"S3_BUCKET_NAME"`
+		S3AccessKey  string `mapstructure:"S3_ACCESS_KEY"`
+		S3SecretKey  string `mapstructure:"S3_SECRET_KEY"`
+		S3Region     string `mapstructure:"S3_REGION"`
+		S3Domain     string `mapstructure:"S3_DOMAIN"`
 	}
 }
 
@@ -140,4 +152,24 @@ func (cfg *envConfigs) AccessTokenExpiry() int {
 
 func (cfg *envConfigs) RefreshTokenExpiry() int {
 	return cfg.env.RefreshTokenExpiry
+}
+
+func (cfg *envConfigs) S3BucketName() string {
+	return cfg.env.S3BucketName
+}
+
+func (cfg *envConfigs) S3AccessKey() string {
+	return cfg.env.S3AccessKey
+}
+
+func (cfg *envConfigs) S3SecretKey() string {
+	return cfg.env.S3SecretKey
+}
+
+func (cfg *envConfigs) S3Region() string {
+	return cfg.env.S3Region
+}
+
+func (cfg *envConfigs) S3Domain() string {
+	return cfg.env.S3Domain
 }

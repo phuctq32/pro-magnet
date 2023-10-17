@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"pro-magnet/components/appcontext"
+	"pro-magnet/components/upload"
 	"pro-magnet/components/validator"
 	"pro-magnet/configs"
 	"pro-magnet/middlewares"
@@ -37,8 +38,17 @@ func main() {
 	// Validator
 	appValidator := validator.NewValidator()
 
+	// S3 upload provider
+	s3Uploader := upload.NewS3Provider(
+		configs.EnvConfigs.S3AccessKey(),
+		configs.EnvConfigs.S3SecretKey(),
+		configs.EnvConfigs.S3BucketName(),
+		configs.EnvConfigs.S3Region(),
+		configs.EnvConfigs.S3Domain(),
+	)
+
 	// Init AppContext
-	appCtx := appcontext.NewAppContext(db, redisCli, appValidator)
+	appCtx := appcontext.NewAppContext(db, redisCli, appValidator, s3Uploader)
 
 	if env == configs.Production {
 		gin.SetMode(gin.ReleaseMode)
