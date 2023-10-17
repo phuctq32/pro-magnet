@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"pro-magnet/components/appcontext"
+	"pro-magnet/components/asyncgroup"
 	"pro-magnet/components/upload"
 	"pro-magnet/components/validator"
 	"pro-magnet/configs"
@@ -47,8 +48,12 @@ func main() {
 		configs.EnvConfigs.S3Domain(),
 	)
 
+	// Async Group
+	asyncg, agCancel := asyncgroup.New(10000)
+	defer agCancel()
+
 	// Init AppContext
-	appCtx := appcontext.NewAppContext(db, redisCli, appValidator, s3Uploader)
+	appCtx := appcontext.NewAppContext(db, redisCli, appValidator, asyncg, s3Uploader)
 
 	if env == configs.Production {
 		gin.SetMode(gin.ReleaseMode)

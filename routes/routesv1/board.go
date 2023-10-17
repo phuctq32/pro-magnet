@@ -14,7 +14,7 @@ func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	boardRepo := boardrepo.NewBoardRepository(appCtx.DBConnection())
 	wsRepo := wsrepo.NewWorkspaceRepository(appCtx.DBConnection())
 
-	boardUC := boarduc.NewBoardUseCase(boardRepo, wsRepo)
+	boardUC := boarduc.NewBoardUseCase(boardRepo, wsRepo, appCtx.AsyncGroup())
 
 	boardHdl := boardapi.NewBoardHandler(boardUC)
 
