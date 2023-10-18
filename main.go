@@ -48,12 +48,22 @@ func main() {
 		configs.EnvConfigs.S3Domain(),
 	)
 
+	// Cloudinary uploade provider
+	cldUploader, err := upload.NewCloudinaryUploader(
+		configs.EnvConfigs.CloudinaryCloudName(),
+		configs.EnvConfigs.CloudinaryApiKey(),
+		configs.EnvConfigs.CloudinaryApiSecret(),
+	)
+	if err != nil {
+		log.Fatal().Err(err)
+	}
+
 	// Async Group
 	asyncg, agCancel := asyncgroup.New(10000)
 	defer agCancel()
 
 	// Init AppContext
-	appCtx := appcontext.NewAppContext(db, redisCli, appValidator, asyncg, s3Uploader)
+	appCtx := appcontext.NewAppContext(db, redisCli, appValidator, asyncg, s3Uploader, cldUploader)
 
 	if env == configs.Production {
 		gin.SetMode(gin.ReleaseMode)
@@ -77,7 +87,7 @@ func main() {
 	// setup routes
 	routes.Setup(appCtx, router)
 
-	err := router.Run(fmt.Sprintf(":%v", configs.EnvConfigs.Port()))
+	err = router.Run(fmt.Sprintf(":%v", configs.EnvConfigs.Port()))
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
