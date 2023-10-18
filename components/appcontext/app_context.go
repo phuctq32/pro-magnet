@@ -6,9 +6,11 @@ import (
 	"pro-magnet/components/asyncgroup"
 	"pro-magnet/components/upload"
 	"pro-magnet/components/validator"
+	"pro-magnet/configs/envconfigs"
 )
 
 type AppContext interface {
+	EnvConfigs() envconfigs.Configs
 	DBConnection() *mongo.Database
 	RedisClient() *redis.Client
 	Validator() validator.Validator
@@ -18,6 +20,7 @@ type AppContext interface {
 }
 
 type appContext struct {
+	envConfigs  envconfigs.Configs
 	mongodb     *mongo.Database
 	redisCli    *redis.Client
 	validator   validator.Validator
@@ -27,6 +30,7 @@ type appContext struct {
 }
 
 func NewAppContext(
+	envConfigs envconfigs.Configs,
 	db *mongo.Database,
 	redisCli *redis.Client,
 	validator validator.Validator,
@@ -35,6 +39,7 @@ func NewAppContext(
 	cldUploader upload.Uploader,
 ) AppContext {
 	return &appContext{
+		envConfigs:  envConfigs,
 		mongodb:     db,
 		redisCli:    redisCli,
 		validator:   validator,
@@ -42,6 +47,10 @@ func NewAppContext(
 		s3Uploader:  s3Uploader,
 		cldUploader: cldUploader,
 	}
+}
+
+func (appCtx *appContext) EnvConfigs() envconfigs.Configs {
+	return appCtx.envConfigs
 }
 
 func (appCtx *appContext) DBConnection() *mongo.Database {

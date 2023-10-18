@@ -15,7 +15,7 @@ import (
 	"pro-magnet/components/asyncgroup"
 	"pro-magnet/components/upload"
 	"pro-magnet/components/validator"
-	"pro-magnet/configs"
+	"pro-magnet/configs/envconfigs"
 	"pro-magnet/middlewares"
 	"pro-magnet/routes"
 	"time"
@@ -26,33 +26,33 @@ func main() {
 
 	initLogger(env)
 
-	// Load env
-	configs.LoadEnvConfigs(env)
+	// Load env configs
+	envConfigs := envconfigs.New(env)
 
 	// DB
-	db, cancel := connectMongoDB()
+	db, cancel := connectMongoDB(envConfigs.Mongo().ConnectionString(), envConfigs.Mongo().DBName())
 	defer cancel()
 
 	// Redis Client
-	redisCli := connectRedisCli()
+	redisCli := connectRedisCli(envConfigs.Redis().Address())
 
 	// Validator
 	appValidator := validator.NewValidator()
 
 	// S3 upload provider
 	s3Uploader := upload.NewS3Provider(
-		configs.EnvConfigs.S3AccessKey(),
-		configs.EnvConfigs.S3SecretKey(),
-		configs.EnvConfigs.S3BucketName(),
-		configs.EnvConfigs.S3Region(),
-		configs.EnvConfigs.S3Domain(),
+		envConfigs.AwsS3().AccessKey(),
+		envConfigs.AwsS3().SecretKey(),
+		envConfigs.AwsS3().BucketName(),
+		envConfigs.AwsS3().Region(),
+		envConfigs.AwsS3().Domain(),
 	)
 
-	// Cloudinary uploade provider
+	// Cloudinary upload provider
 	cldUploader, err := upload.NewCloudinaryUploader(
-		configs.EnvConfigs.CloudinaryCloudName(),
-		configs.EnvConfigs.CloudinaryApiKey(),
-		configs.EnvConfigs.CloudinaryApiSecret(),
+		envConfigs.Cloudinary().CloudName(),
+		envConfigs.Cloudinary().ApiKey(),
+		envConfigs.Cloudinary().ApiSecret(),
 	)
 	if err != nil {
 		log.Fatal().Err(err)
@@ -63,16 +63,16 @@ func main() {
 	defer agCancel()
 
 	// Init AppContext
-	appCtx := appcontext.NewAppContext(db, redisCli, appValidator, asyncg, s3Uploader, cldUploader)
+	appCtx := appcontext.NewAppContext(envConfigs, db, redisCli, appValidator, asyncg, s3Uploader, cldUploader)
 
-	if env == configs.Production {
+	if env == envconfigs.Production {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
 	router := gin.New()
 
 	router.Use(middlewares.Logger())
-	if env == configs.Development {
+	if env == envconfigs.Development {
 		router.Use(gin.Recovery())
 	}
 
@@ -87,7 +87,7 @@ func main() {
 	// setup routes
 	routes.Setup(appCtx, router)
 
-	err = router.Run(fmt.Sprintf(":%v", configs.EnvConfigs.Port()))
+	err = router.Run(fmt.Sprintf(":%v", envConfigs.App().Port()))
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
@@ -111,10 +111,7 @@ func Cors(allowOrigin string) gin.HandlerFunc {
 	}
 }
 
-func connectMongoDB() (*mongo.Database, context.CancelFunc) {
-	mongoUri := configs.EnvConfigs.MongoConnectionString()
-	mongoDBName := configs.EnvConfigs.MongoDBName()
-
+func connectMongoDB(mongoUri, mongoDBName string) (*mongo.Database, context.CancelFunc) {
 	opts := options.Client().ApplyURI(mongoUri)
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*10)
 	client, err := mongo.Connect(ctx, opts)
@@ -138,7 +135,7 @@ func initLogger(env string) {
 	zerolog.TimeFieldFormat = time.RFC3339
 	zerolog.SetGlobalLevel(zerolog.InfoLevel) // production
 
-	if env == configs.Development {
+	if env == envconfigs.Development {
 		zerolog.SetGlobalLevel(zerolog.DebugLevel)
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stderr})
 	}
@@ -147,9 +144,9 @@ func initLogger(env string) {
 	log.Logger = log.With().Caller().Logger()
 }
 
-func connectRedisCli() *redis.Client {
+func connectRedisCli(redisAddr string) *redis.Client {
 	return redis.NewClient(&redis.Options{
-		Addr:     configs.EnvConfigs.RedisAddr(),
+		Addr:     redisAddr,
 		Password: "", // no password set
 		DB:       0,  // default db
 	})
