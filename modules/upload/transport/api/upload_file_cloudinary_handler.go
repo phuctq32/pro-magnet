@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (hdl *uploadHandler) UploadFileWithS3(appCtx appcontext.AppContext) gin.HandlerFunc {
+func (hdl *uploadHandler) UploadFileWithCloudinary(appCtx appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		file, err := hdl.getFileFromRequest(c)
 		if err != nil {
@@ -17,7 +17,7 @@ func (hdl *uploadHandler) UploadFileWithS3(appCtx appcontext.AppContext) gin.Han
 		}
 		file.Folder = fmt.Sprintf("%v", time.Now().UnixNano())
 
-		data, err := hdl.s3UploadUC.UploadFile(c.Request.Context(), file)
+		data, err := hdl.cldUploadUC.UploadFile(c.Request.Context(), file)
 		if err != nil {
 			panic(err)
 		}

@@ -14,14 +14,16 @@ type AppContext interface {
 	Validator() validator.Validator
 	S3Uploader() upload.Uploader
 	AsyncGroup() asyncgroup.AsyncGroup
+	CloudinaryUploader() upload.Uploader
 }
 
 type appContext struct {
-	mongodb    *mongo.Database
-	redisCli   *redis.Client
-	validator  validator.Validator
-	s3Uploader upload.Uploader
-	asyncg     asyncgroup.AsyncGroup
+	mongodb     *mongo.Database
+	redisCli    *redis.Client
+	validator   validator.Validator
+	asyncg      asyncgroup.AsyncGroup
+	s3Uploader  upload.Uploader
+	cldUploader upload.Uploader
 }
 
 func NewAppContext(
@@ -30,13 +32,15 @@ func NewAppContext(
 	validator validator.Validator,
 	asyncg asyncgroup.AsyncGroup,
 	s3Uploader upload.Uploader,
+	cldUploader upload.Uploader,
 ) AppContext {
 	return &appContext{
-		mongodb:    db,
-		redisCli:   redisCli,
-		validator:  validator,
-		asyncg:     asyncg,
-		s3Uploader: s3Uploader,
+		mongodb:     db,
+		redisCli:    redisCli,
+		validator:   validator,
+		asyncg:      asyncg,
+		s3Uploader:  s3Uploader,
+		cldUploader: cldUploader,
 	}
 }
 
@@ -58,4 +62,8 @@ func (appCtx *appContext) AsyncGroup() asyncgroup.AsyncGroup {
 
 func (appCtx *appContext) S3Uploader() upload.Uploader {
 	return appCtx.s3Uploader
+}
+
+func (appCtx *appContext) CloudinaryUploader() upload.Uploader {
+	return appCtx.cldUploader
 }

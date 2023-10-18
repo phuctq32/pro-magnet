@@ -31,6 +31,9 @@ type EnvConfiguration interface {
 	S3SecretKey() string
 	S3Region() string
 	S3Domain() string
+	CloudinaryCloudName() string
+	CloudinaryApiKey() string
+	CloudinaryApiSecret() string
 }
 
 type envConfigs struct {
@@ -61,6 +64,11 @@ type envConfigs struct {
 		S3SecretKey  string `mapstructure:"S3_SECRET_KEY"`
 		S3Region     string `mapstructure:"S3_REGION"`
 		S3Domain     string `mapstructure:"S3_DOMAIN"`
+
+		// Cloudinary
+		CldApiKey    string `mapstructure:"CLOUDINARY_API_KEY"`
+		CldApiSecret string `mapstructure:"CLOUDINARY_API_SECRET"`
+		CldCloudName string `mapstructure:"CLOUDINARY_CLOUD_NAME"`
 	}
 }
 
@@ -172,4 +180,16 @@ func (cfg *envConfigs) S3Region() string {
 
 func (cfg *envConfigs) S3Domain() string {
 	return cfg.env.S3Domain
+}
+
+func (cfg *envConfigs) CloudinaryCloudName() string {
+	return cfg.env.CldCloudName
+}
+
+func (cfg *envConfigs) CloudinaryApiKey() string {
+	return cfg.env.CldApiKey
+}
+
+func (cfg *envConfigs) CloudinaryApiSecret() string {
+	return cfg.env.CldApiSecret
 }

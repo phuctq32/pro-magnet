@@ -10,9 +10,16 @@ type UploadUseCase interface {
 }
 
 type uploadHandler struct {
-	uc UploadUseCase
+	s3UploadUC  UploadUseCase
+	cldUploadUC UploadUseCase
 }
 
-func NewUploadHandler() *uploadHandler {
-	return &uploadHandler{}
+func NewUploadHandler(
+	s3UploadUC UploadUseCase,
+	cldUploadUC UploadUseCase,
+) *uploadHandler {
+	return &uploadHandler{
+		s3UploadUC:  s3UploadUC,
+		cldUploadUC: cldUploadUC,
+	}
 }
