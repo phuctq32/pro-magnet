@@ -22,15 +22,18 @@ type AuthRedisRepository interface {
 }
 
 type authUseCase struct {
-	userRepo      UserRepository
-	redisRepo     AuthRedisRepository
-	hasher        hasher.Hasher
-	mailer        mailer.Mailer
-	tokenProvider jwt.TokenProvider
-	atSecret      string
-	rtSecret      string
-	atExpiry      int
-	rtExpiry      int
+	userRepo              UserRepository
+	redisRepo             AuthRedisRepository
+	hasher                hasher.Hasher
+	mailer                mailer.Mailer
+	fromEmail             string
+	verifyEmailTemplateId string
+	verificationUrl       string
+	tokenProvider         jwt.TokenProvider
+	atSecret              string
+	rtSecret              string
+	atExpiry              int
+	rtExpiry              int
 }
 
 func NewAuthUseCase(
@@ -38,6 +41,9 @@ func NewAuthUseCase(
 	authRedisRepo AuthRedisRepository,
 	hasher hasher.Hasher,
 	mailer mailer.Mailer,
+	fromEmail string,
+	verifyEmailTemplateId string,
+	verificationUrl string,
 	tokenProvider jwt.TokenProvider,
 	atSecret string,
 	rtSecret string,
@@ -45,14 +51,17 @@ func NewAuthUseCase(
 	rtExpiry int,
 ) *authUseCase {
 	return &authUseCase{
-		userRepo:      userRepo,
-		redisRepo:     authRedisRepo,
-		hasher:        hasher,
-		mailer:        mailer,
-		tokenProvider: tokenProvider,
-		atSecret:      atSecret,
-		rtSecret:      rtSecret,
-		atExpiry:      atExpiry,
-		rtExpiry:      rtExpiry,
+		userRepo:              userRepo,
+		redisRepo:             authRedisRepo,
+		hasher:                hasher,
+		mailer:                mailer,
+		fromEmail:             fromEmail,
+		verifyEmailTemplateId: verifyEmailTemplateId,
+		verificationUrl:       verificationUrl,
+		tokenProvider:         tokenProvider,
+		atSecret:              atSecret,
+		rtSecret:              rtSecret,
+		atExpiry:              atExpiry,
+		rtExpiry:              rtExpiry,
 	}
 }

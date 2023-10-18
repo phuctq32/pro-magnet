@@ -8,7 +8,6 @@ import (
 	"github.com/rs/zerolog/log"
 	"pro-magnet/common"
 	"pro-magnet/components/mailer"
-	"pro-magnet/configs"
 	usermodel "pro-magnet/modules/user/model"
 )
 
@@ -45,13 +44,13 @@ func (uc *authUseCase) sendVerificationEmail(ctx context.Context, user *usermode
 
 	// Send email verification
 	emailConfig := mailer.NewEmailConfigWithDynamicTemplate(
-		configs.EnvConfigs.SendgridFromEmail(),
+		uc.fromEmail,
 		user.Email,
 		"Verify Email",
-		configs.EnvConfigs.SendgridVerifyEmailTemplateId(),
+		uc.verifyEmailTemplateId,
 		map[string]interface{}{
 			"username": user.Name,
-			"url":      configs.EnvConfigs.VerificationURL() + verifiedToken,
+			"url":      uc.verificationUrl + verifiedToken,
 		},
 	)
 

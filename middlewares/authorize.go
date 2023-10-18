@@ -6,7 +6,6 @@ import (
 	"pro-magnet/common"
 	"pro-magnet/components/appcontext"
 	"pro-magnet/components/jwt"
-	"pro-magnet/configs"
 	userrepo "pro-magnet/modules/user/repository/mongo"
 	"strings"
 )
@@ -20,7 +19,7 @@ func Authorize(appCtx appcontext.AppContext) gin.HandlerFunc {
 		}
 		tokenProvider := jwt.NewJwtProvider()
 
-		payload, err := tokenProvider.Validate(parts[1], configs.EnvConfigs.AccessSecret())
+		payload, err := tokenProvider.Validate(parts[1], appCtx.EnvConfigs().App().AccessSecret())
 		if err != nil {
 			panic(common.NewUnauthorizedErr(err, "invalid token"))
 		}
