@@ -1,15 +1,97 @@
-version: '3'
+version: '3.9'
 
 services:
-  mongodb:
-    image: mongo
-    restart: always
+  # Mongo replica set
+  mongo-init:
+    image: mongo:7.0
+    restart: on-failure
+    env_file:
+      - ./prod.env
     volumes:
-      - data:/data/db
+      - ./.docker/mongo/scripts/rs-init.sh:/scripts/rs-init.sh
+    entrypoint: [ "bash", "/scripts/rs-init.sh" ]
+    depends_on:
+      - mongo-primary
+      - mongo-secondary1
+      - mongo-secondary2
+
+  mongo-primary:
+    image: mongo:7.0
+    restart: on-failure
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /auth/file.key /auth/keyfile
+        chmod 400 /auth/keyfile
+        chown 999:999 /auth/keyfile
+        exec docker-entrypoint.sh $$@
+    command: [ "usr/bin/mongod", "--keyFile", "/auth/keyfile", "--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all" ]
     ports:
       - "27017:27017"
+    volumes:
+      - data:/data/db
+      - ./.docker/mongo/file.key:/auth/file.key
+    healthcheck:
+      test: echo 'rs.status().ok' | mongosh admin --port 27017 -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --quiet | grep 1
+      interval: 30s
+      start_period: 60s
     env_file:
-      - ./docker.env
+      - ./prod.env
+
+  mongo-secondary1:
+    image: mongo:7.0
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /auth/file.key /auth/keyfile
+        chmod 400 /auth/keyfile
+        chown 999:999 /auth/keyfile
+        exec docker-entrypoint.sh $$@
+    command: [ "usr/bin/mongod", "--keyFile", "/auth/keyfile", "--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all" ]
+    restart: on-failure
+    ports:
+      - "27021:27017"
+    volumes:
+      - data1:/data/db
+      - ./.docker/mongo/file.key:/auth/file.key
+    healthcheck:
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongosh admin -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --quiet | grep 1
+      interval: 30s
+      start_period: 60s
+    depends_on:
+      - mongo-primary
+    env_file:
+      - ./prod.env
+
+  mongo-secondary2:
+    image: mongo:7.0
+    entrypoint:
+      - bash
+      - -c
+      - |
+        cp /auth/file.key /auth/keyfile
+        chmod 400 /auth/keyfile
+        chown 999:999 /auth/keyfile
+        exec docker-entrypoint.sh $$@
+    command: [ "usr/bin/mongod", "--keyFile", "/auth/keyfile", "--replSet", "${MONGO_REPLICA_SET_NAME}", "--bind_ip_all" ]
+    restart: on-failure
+    ports:
+      - "27022:27017"
+    volumes:
+      - data2:/data/db
+      - ./.docker/mongo/file.key:/auth/file.key
+    healthcheck:
+      test: echo 'db.runCommand({serverStatus:1}).ok' | mongosh admin -u $${MONGO_INITDB_ROOT_USERNAME} -p $${MONGO_INITDB_ROOT_PASSWORD} --quiet | grep 1
+      interval: 30s
+      start_period: 60s
+    depends_on:
+      - mongo-primary
+    env_file:
+      - ./prod.env
+
+  # Redis
   redis:
     image: redis:7.2-alpine3.18
     restart: always
@@ -17,18 +99,22 @@ services:
       - cache:/data
     ports:
       - "6379:6379"
+
+  # Application
   server:
     image: phuctq32/pro-magnet
     ports:
       - "8080:8080"
     env_file:
-      - ./docker.env
+      - ./prod.env
     environment:
       - ENV=production
     depends_on:
-      - mongodb
+      - mongo-primary
       - redis
 
 volumes:
   data:
+  data1:
+  data2:
   cache:
