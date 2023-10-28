@@ -47,6 +47,8 @@ func convert(err validator2.FieldError) *ValidationError {
 		}
 	case "mongodb":
 		res.Message = "Invalid ObjectId"
+	case "hexcolor":
+		res.Message = "Invalid hex color string"
 	}
 
 	return res

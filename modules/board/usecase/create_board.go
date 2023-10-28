@@ -11,7 +11,7 @@ func (uc *boardUseCase) CreateBoard(
 	data *boardmodel.BoardCreation,
 ) (*boardmodel.Board, error) {
 	checkBoardNameExistedTask := func(ctx context.Context) error {
-		ok, err := uc.boardRepo.ExistsInWorkspace(ctx, data.WorkspaceId)
+		ok, err := uc.boardRepo.ExistsInWorkspace(ctx, data.Name, data.WorkspaceId)
 		if err != nil {
 			return err
 		}
