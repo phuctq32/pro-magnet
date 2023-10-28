@@ -56,7 +56,7 @@ func LoadEnvConfigs(env string) *envConfigs {
 
 func (cfg *envConfigs) LoadFromEnvFile() {
 	viper.AddConfigPath(".")
-	viper.SetConfigFile(".env")
+	viper.SetConfigFile("dev.env")
 
 	if err := viper.ReadInConfig(); err != nil {
 		log.Fatal().Err(err).Msg("cannot load environment variables from envConfigs file")
