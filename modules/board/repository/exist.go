@@ -23,9 +23,10 @@ func (repo *boardRepository) Exists(
 
 func (repo *boardRepository) ExistsInWorkspace(
 	ctx context.Context,
+	boardName string,
 	workspaceId string,
 ) (bool, error) {
 	wsOid, _ := primitive.ObjectIDFromHex(workspaceId)
 
-	return repo.Exists(ctx, map[string]interface{}{"workspaceId": wsOid})
+	return repo.Exists(ctx, map[string]interface{}{"workspaceId": wsOid, "name": boardName})
 }

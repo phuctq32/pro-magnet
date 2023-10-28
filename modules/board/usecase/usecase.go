@@ -8,7 +8,7 @@ import (
 
 type BoardRepository interface {
 	Create(ctx context.Context, data *boardmodel.BoardCreation) (*boardmodel.Board, error)
-	ExistsInWorkspace(ctx context.Context, workspaceId string) (bool, error)
+	ExistsInWorkspace(ctx context.Context, boardName, workspaceId string) (bool, error)
 }
 
 type WorkspaceRepository interface {

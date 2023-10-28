@@ -12,4 +12,5 @@ func Setup(appCtx appcontext.AppContext, engine *gin.Engine) {
 	routesv1.NewWorkspaceRouter(appCtx, v1)
 	routesv1.NewBoardRouter(appCtx, v1)
 	routesv1.NewUploadRouter(appCtx, v1)
+	routesv1.NewLabelRouter(appCtx, v1)
 }

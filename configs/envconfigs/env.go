@@ -68,7 +68,7 @@ func (cfg *envConfigs) LoadFromEnvFile() {
 }
 
 func (cfg *envConfigs) LoadConfigsFromOS() {
-	t := reflect.ValueOf(&cfg).Elem().Type()
+	t := reflect.ValueOf(cfg).Elem().Type()
 	for i := 0; i < t.NumField(); i++ {
 		if tagValue := t.Field(i).Tag.Get("mapstructure"); tagValue != "-" {
 			if err := viper.BindEnv(tagValue); err != nil {
@@ -77,7 +77,7 @@ func (cfg *envConfigs) LoadConfigsFromOS() {
 		}
 	}
 
-	if err := viper.Unmarshal(&cfg); err != nil {
+	if err := viper.Unmarshal(cfg); err != nil {
 		log.Fatal().Err(err).Msg("unmarshal envConfigs error happened")
 	}
 }

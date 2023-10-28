@@ -4,8 +4,7 @@ build:
 
 dev:
 	@docker compose --env-file ./prod.env up -d \
-	mongo-primary mongo-secondary1 mongo-secondary2 redis \
-	&& docker compose --env-file ./prod.env run --rm mongo-init
+	mongo-init mongo-primary mongo-secondary1 mongo-secondary2 redis \
 
 prod:
 	docker compose --env-file ./prod.env up -d

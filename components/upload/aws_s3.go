@@ -28,7 +28,6 @@ func NewS3Provider(
 	region string,
 	domain string,
 ) *s3Provider {
-	log.Println(accessKey, secretKey, bucketName, region, domain)
 	provider := &s3Provider{
 		bucketName: bucketName,
 		region:     region,
