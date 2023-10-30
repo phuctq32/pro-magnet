@@ -15,6 +15,7 @@ type User struct {
 	Avatar      string     `json:"avatar" bson:"avatar"`
 	PhoneNumber *string    `json:"phoneNumber,omitempty" bson:"phoneNumber,omitempty"`
 	Birthday    *time.Time `json:"birthday,omitempty" bson:"birthday,omitempty"`
+	IsInternal  bool       `json:"-" bson:"isInternal"`
 }
 
 func (u *User) UserId() string {

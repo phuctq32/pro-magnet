@@ -9,9 +9,12 @@ import (
 )
 
 func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUser) error {
-	// Should be in a transaction
-	if err := uc.userRepo.CheckEmailExists(ctx, data.Email); err != nil {
+	isExisted, err := uc.userRepo.UserExist(ctx, data.Email)
+	if err != nil {
 		return err
+	}
+	if isExisted {
+		return common.NewBadRequestErr(authmodel.ErrUserExisted)
 	}
 
 	hashedPw, err := uc.hasher.Hash(data.Password)
@@ -30,6 +33,7 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 		Avatar:      authmodel.DefaultAvatarUrl,
 		PhoneNumber: &data.PhoneNumber,
 		Birthday:    &data.Birthday,
+		IsInternal:  true,
 	}
 
 	if err = uc.userRepo.WithTransaction(ctx, func(txCtx context.Context) error {

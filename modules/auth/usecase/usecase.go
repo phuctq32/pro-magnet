@@ -10,7 +10,7 @@ import (
 
 type UserRepository interface {
 	Create(ctx context.Context, data *usermodel.User) (*string, error)
-	CheckEmailExists(ctx context.Context, email string) error
+	UserExist(ctx context.Context, email string) (bool, error)
 	SetEmailVerified(ctx context.Context, id string) error
 	FindByEmail(ctx context.Context, email string) (*usermodel.User, error)
 	FindById(ctx context.Context, id string) (*usermodel.User, error)
