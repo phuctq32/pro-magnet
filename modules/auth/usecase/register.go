@@ -9,9 +9,12 @@ import (
 )
 
 func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUser) error {
-	// Should be in a transaction
-	if err := uc.userRepo.CheckEmailExists(ctx, data.Email); err != nil {
+	isExisted, err := uc.userRepo.UserExist(ctx, data.Email)
+	if err != nil {
 		return err
+	}
+	if isExisted {
+		return common.NewBadRequestErr(authmodel.ErrUserExisted)
 	}
 
 	hashedPw, err := uc.hasher.Hash(data.Password)
@@ -28,18 +31,25 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 		Password:    hashedPw,
 		IsVerified:  false,
 		Avatar:      authmodel.DefaultAvatarUrl,
-		PhoneNumber: data.PhoneNumber,
-		Birthday:    data.Birthday,
+		PhoneNumber: &data.PhoneNumber,
+		Birthday:    &data.Birthday,
+		IsInternal:  true,
 	}
 
-	userId, err := uc.userRepo.Create(ctx, newUser)
-	if err != nil {
+	if err = uc.userRepo.WithTransaction(ctx, func(txCtx context.Context) error {
+		userId, e := uc.userRepo.Create(txCtx, newUser)
+		if e != nil {
+			return e
+		}
+		newUser.Id = userId
+
+		if e = uc.sendVerificationEmail(txCtx, newUser); e != nil {
+			return common.NewServerErr(e)
+		}
+
+		return nil
+	}); err != nil {
 		return err
-	}
-	newUser.Id = userId
-
-	if err = uc.sendVerificationEmail(ctx, newUser); err != nil {
-		return common.NewServerErr(err)
 	}
 
 	return nil

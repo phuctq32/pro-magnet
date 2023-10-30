@@ -25,7 +25,7 @@ func (uc *labelUseCase) CreateLabel(
 	var label *labelmodel.Label
 	var e error
 
-	err = uc.labelRepo.WithinTransaction(ctx, func(txCtx context.Context) error {
+	err = uc.labelRepo.WithTransaction(ctx, func(txCtx context.Context) error {
 		label, e = uc.labelRepo.Create(txCtx, data)
 		if e != nil {
 			return e

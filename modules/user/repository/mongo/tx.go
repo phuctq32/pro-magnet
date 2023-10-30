@@ -1,11 +1,11 @@
-package labelrepo
+package userrepo
 
 import (
 	"context"
 	"pro-magnet/common"
 )
 
-func (repo *labelRepository) WithTransaction(
+func (repo *userRepository) WithTransaction(
 	ctx context.Context,
 	fn func(context.Context) error,
 ) error {
