@@ -14,6 +14,7 @@ type UserRepository interface {
 	SetEmailVerified(ctx context.Context, id string) error
 	FindByEmail(ctx context.Context, email string) (*usermodel.User, error)
 	FindById(ctx context.Context, id string) (*usermodel.User, error)
+	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 
 type AuthRedisRepository interface {

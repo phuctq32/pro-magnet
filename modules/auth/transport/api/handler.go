@@ -9,7 +9,7 @@ type AuthUseCase interface {
 	Register(ctx context.Context, data *authmodel.RegisterUser) error
 	Verify(ctx context.Context, verifiedToken string) error
 	SendVerificationEmail(ctx context.Context, email string) error
-	Login(ctx context.Context, data *authmodel.LoginUser) (*authmodel.TokenPair, error)
+	Login(ctx context.Context, data *authmodel.LoginUser) (*authmodel.LoginResponse, error)
 	RefreshAccessToken(ctx context.Context, refreshToken string) (*string, error)
 }
 

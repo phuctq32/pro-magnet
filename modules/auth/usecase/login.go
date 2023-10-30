@@ -8,7 +8,7 @@ import (
 	authmodel "pro-magnet/modules/auth/model"
 )
 
-func (uc *authUseCase) Login(ctx context.Context, data *authmodel.LoginUser) (*authmodel.TokenPair, error) {
+func (uc *authUseCase) Login(ctx context.Context, data *authmodel.LoginUser) (*authmodel.LoginResponse, error) {
 	user, err := uc.userRepo.FindByEmail(ctx, data.Email)
 	if err != nil {
 		return nil, err
@@ -33,8 +33,9 @@ func (uc *authUseCase) Login(ctx context.Context, data *authmodel.LoginUser) (*a
 		return nil, err
 	}
 
-	return &authmodel.TokenPair{
+	return &authmodel.LoginResponse{
 		AccessToken:  *accessToken,
 		RefreshToken: *refreshToken,
+		User:         user,
 	}, nil
 }
