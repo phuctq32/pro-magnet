@@ -17,7 +17,7 @@ func (repo *userRepository) FindOne(ctx context.Context, filter map[string]inter
 		FindOne(ctx, filter).
 		Decode(&user); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, common.NewNotFoundErr("user", mongo.ErrNoDocuments)
+			return nil, common.NewNotFoundErr("user", usermodel.ErrUserNotFound)
 		}
 		return nil, common.NewServerErr(err)
 	}

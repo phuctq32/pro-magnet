@@ -26,3 +26,10 @@ func (repo *userRepository) UserExist(
 ) (bool, error) {
 	return repo.Exist(ctx, map[string]interface{}{"email": email})
 }
+
+func (repo *userRepository) InternalUserExist(
+	ctx context.Context,
+	email string,
+) (bool, error) {
+	return repo.Exist(ctx, map[string]interface{}{"email": email, "isInternal": true})
+}

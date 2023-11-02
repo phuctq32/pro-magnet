@@ -2,6 +2,7 @@ package authuc
 
 import (
 	"context"
+	ggoauth2 "pro-magnet/components/googleoauth2"
 	"pro-magnet/components/hasher"
 	"pro-magnet/components/jwt"
 	"pro-magnet/components/mailer"
@@ -25,6 +26,7 @@ type AuthRedisRepository interface {
 type authUseCase struct {
 	userRepo              UserRepository
 	redisRepo             AuthRedisRepository
+	ggOauth               ggoauth2.GoogleOAuth
 	hasher                hasher.Hasher
 	mailer                mailer.Mailer
 	fromEmail             string
@@ -40,6 +42,7 @@ type authUseCase struct {
 func NewAuthUseCase(
 	userRepo UserRepository,
 	authRedisRepo AuthRedisRepository,
+	ggOauth ggoauth2.GoogleOAuth,
 	hasher hasher.Hasher,
 	mailer mailer.Mailer,
 	fromEmail string,
@@ -54,6 +57,7 @@ func NewAuthUseCase(
 	return &authUseCase{
 		userRepo:              userRepo,
 		redisRepo:             authRedisRepo,
+		ggOauth:               ggOauth,
 		hasher:                hasher,
 		mailer:                mailer,
 		fromEmail:             fromEmail,
