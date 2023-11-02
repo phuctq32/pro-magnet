@@ -11,6 +11,8 @@ type AuthUseCase interface {
 	SendVerificationEmail(ctx context.Context, email string) error
 	Login(ctx context.Context, data *authmodel.LoginUser) (*authmodel.LoginResponse, error)
 	RefreshAccessToken(ctx context.Context, refreshToken string) (*string, error)
+	GoogleOAuthData() (*authmodel.GoogleOAuthData, error)
+	LoginWithGoogle(ctx context.Context, code string) (*authmodel.LoginResponse, error)
 }
 
 type authHandler struct {

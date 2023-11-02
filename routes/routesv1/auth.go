@@ -3,6 +3,7 @@ package routesv1
 import (
 	"github.com/gin-gonic/gin"
 	"pro-magnet/components/appcontext"
+	ggoauth2 "pro-magnet/components/googleoauth2"
 	hasher2 "pro-magnet/components/hasher"
 	"pro-magnet/components/jwt"
 	"pro-magnet/components/mailer/sendgrid"
@@ -16,6 +17,11 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	// Setup dependencies
 	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
 	authRedisRepo := authrepo.NewAuthRedisRepository(appCtx.RedisClient())
+	ggOauth := ggoauth2.NewGoogleOAuth2(
+		appCtx.EnvConfigs().GoogleOAuth().ClientId(),
+		appCtx.EnvConfigs().GoogleOAuth().ClientSecret(),
+		appCtx.EnvConfigs().GoogleOAuth().RedirectUri(),
+	)
 	hasher := hasher2.NewBcryptHash(10)
 	sgMailer := sendgrid.NewSendGridProvider(appCtx.EnvConfigs().Sendgrid().ApiKey())
 	jwtProvider := jwt.NewJwtProvider()
@@ -23,6 +29,7 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	authUC := authuc.NewAuthUseCase(
 		userRepo,
 		authRedisRepo,
+		ggOauth,
 		hasher,
 		sgMailer,
 		appCtx.EnvConfigs().Sendgrid().FromEmail(),
@@ -45,5 +52,7 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		authRouter.POST("/send-verification-email", authHdl.SendVerificationEmail(appCtx))
 		authRouter.POST("/login", authHdl.Login(appCtx))
 		authRouter.POST("/refresh", authHdl.Refresh(appCtx))
+		authRouter.GET("/google", authHdl.LoginWithGoogle(appCtx))
+		authRouter.GET("/google/callback", authHdl.LoginWithGoogleCallback(appCtx))
 	}
 }

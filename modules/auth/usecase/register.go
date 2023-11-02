@@ -28,12 +28,12 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 		UpdatedAt:   now,
 		Email:       data.Email,
 		Name:        data.Name,
-		Password:    hashedPw,
+		Password:    &hashedPw,
 		IsVerified:  false,
 		Avatar:      authmodel.DefaultAvatarUrl,
 		PhoneNumber: &data.PhoneNumber,
 		Birthday:    &data.Birthday,
-		IsInternal:  true,
+		Type:        usermodel.InternalUser,
 	}
 
 	if err = uc.userRepo.WithTransaction(ctx, func(txCtx context.Context) error {

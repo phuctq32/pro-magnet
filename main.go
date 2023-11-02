@@ -23,7 +23,6 @@ import (
 
 func main() {
 	env := os.Getenv("ENV")
-
 	initLogger(env)
 
 	// Load env configs
