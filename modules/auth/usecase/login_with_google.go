@@ -41,8 +41,10 @@ func (uc *authUseCase) LoginWithGoogle(
 	if err != nil && err.Error() != usermodel.ErrUserNotFound.Error() {
 		return nil, err
 	}
-	if user != nil && user.Type != usermodel.GoogleUser {
-		return nil, common.NewBadRequestErr(authmodel.ErrUserExisted)
+	if user != nil {
+		if user.Type != usermodel.GoogleUser {
+			return nil, common.NewBadRequestErr(authmodel.ErrUserExisted)
+		}
 	} else {
 		// Create new Google user
 		now := time.Now()
