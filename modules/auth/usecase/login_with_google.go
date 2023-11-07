@@ -4,7 +4,6 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/base64"
-	"log"
 	"pro-magnet/common"
 	authmodel "pro-magnet/modules/auth/model"
 	usermodel "pro-magnet/modules/user/model"
@@ -42,7 +41,6 @@ func (uc *authUseCase) LoginWithGoogle(
 	if err != nil && err.Error() != usermodel.ErrUserNotFound.Error() {
 		return nil, err
 	}
-	log.Println("toi")
 	if user != nil && user.Type != usermodel.GoogleUser {
 		return nil, common.NewBadRequestErr(authmodel.ErrUserExisted)
 	} else {

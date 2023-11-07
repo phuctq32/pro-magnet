@@ -15,28 +15,33 @@ type UserRepository interface {
 	SetEmailVerified(ctx context.Context, id string) error
 	FindByEmail(ctx context.Context, email string) (*usermodel.User, error)
 	FindById(ctx context.Context, id string) (*usermodel.User, error)
+	UpdatePasswordByEmail(ctx context.Context, email string, password string) error
 	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 
 type AuthRedisRepository interface {
 	SetVerifiedToken(ctx context.Context, token, userId string) error
 	GetVerifiedUserId(ctx context.Context, verifiedToken string) (*string, error)
+	SetResetToken(ctx context.Context, token, email string) error
+	GetResetPasswordEmail(ctx context.Context, resetToken string) (*string, error)
 }
 
 type authUseCase struct {
-	userRepo              UserRepository
-	redisRepo             AuthRedisRepository
-	ggOauth               ggoauth2.GoogleOAuth
-	hasher                hasher.Hasher
-	mailer                mailer.Mailer
-	fromEmail             string
-	verifyEmailTemplateId string
-	verificationUrl       string
-	tokenProvider         jwt.TokenProvider
-	atSecret              string
-	rtSecret              string
-	atExpiry              int
-	rtExpiry              int
+	userRepo                     UserRepository
+	redisRepo                    AuthRedisRepository
+	ggOauth                      ggoauth2.GoogleOAuth
+	hasher                       hasher.Hasher
+	mailer                       mailer.Mailer
+	fromEmail                    string
+	verifyEmailTemplateId        string
+	resetPasswordEmailTemplateId string
+	verificationUrl              string
+	resetPasswordUrl             string
+	tokenProvider                jwt.TokenProvider
+	atSecret                     string
+	rtSecret                     string
+	atExpiry                     int
+	rtExpiry                     int
 }
 
 func NewAuthUseCase(
@@ -47,7 +52,9 @@ func NewAuthUseCase(
 	mailer mailer.Mailer,
 	fromEmail string,
 	verifyEmailTemplateId string,
+	resetPasswordEmailTemplateId string,
 	verificationUrl string,
+	resetPasswordUrl string,
 	tokenProvider jwt.TokenProvider,
 	atSecret string,
 	rtSecret string,
@@ -55,18 +62,20 @@ func NewAuthUseCase(
 	rtExpiry int,
 ) *authUseCase {
 	return &authUseCase{
-		userRepo:              userRepo,
-		redisRepo:             authRedisRepo,
-		ggOauth:               ggOauth,
-		hasher:                hasher,
-		mailer:                mailer,
-		fromEmail:             fromEmail,
-		verifyEmailTemplateId: verifyEmailTemplateId,
-		verificationUrl:       verificationUrl,
-		tokenProvider:         tokenProvider,
-		atSecret:              atSecret,
-		rtSecret:              rtSecret,
-		atExpiry:              atExpiry,
-		rtExpiry:              rtExpiry,
+		userRepo:                     userRepo,
+		redisRepo:                    authRedisRepo,
+		ggOauth:                      ggOauth,
+		hasher:                       hasher,
+		mailer:                       mailer,
+		fromEmail:                    fromEmail,
+		verifyEmailTemplateId:        verifyEmailTemplateId,
+		resetPasswordEmailTemplateId: resetPasswordEmailTemplateId,
+		verificationUrl:              verificationUrl,
+		resetPasswordUrl:             resetPasswordUrl,
+		tokenProvider:                tokenProvider,
+		atSecret:                     atSecret,
+		rtSecret:                     rtSecret,
+		atExpiry:                     atExpiry,
+		rtExpiry:                     rtExpiry,
 	}
 }

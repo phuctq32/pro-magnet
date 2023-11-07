@@ -55,3 +55,19 @@ func (repo *userRepository) SetEmailVerified(
 
 	return nil
 }
+
+func (repo *userRepository) UpdatePasswordByEmail(
+	ctx context.Context,
+	email string,
+	password string,
+) error {
+	if _, err := repo.Update(
+		ctx,
+		map[string]interface{}{"email": email},
+		map[string]interface{}{"password": password},
+	); err != nil {
+		return err
+	}
+
+	return nil
+}

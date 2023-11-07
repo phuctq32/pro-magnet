@@ -22,10 +22,12 @@ type envConfigs struct {
 	RedisAddr string `mapstructure:"REDIS_ADDR"`
 
 	// Sendgrid
-	SendGridApiKey                string `mapstructure:"SENDGRID_API_KEY"`
-	SendGridFromEmail             string `mapstructure:"FROM_EMAIL"`
-	SendGridVerifyEmailTemplateId string `mapstructure:"SENDGRID_VERIFY_TEMPlATE_ID"`
-	VerificationURL               string `mapstructure:"VERIFICATION_URL"`
+	SendGridApiKey                       string `mapstructure:"SENDGRID_API_KEY"`
+	SendGridFromEmail                    string `mapstructure:"FROM_EMAIL"`
+	SendGridVerifyEmailTemplateId        string `mapstructure:"SENDGRID_VERIFY_TEMPlATE_ID"`
+	SendGridResetPasswordEmailTemplateId string `mapstructure:"SENDGRID_RESET_PASSWORD_TEMPLATE_ID"`
+	VerificationURL                      string `mapstructure:"VERIFICATION_URL"`
+	ResetPasswordURL                     string `mapstructure:"RESET_PASSWORD_URL"`
 
 	// AWS S3
 	S3BucketName string `mapstructure:"S3_BUCKET_NAME"`

@@ -5,6 +5,8 @@ type SendgridConfig interface {
 	FromEmail() string
 	VerifyEmailTemplateId() string
 	VerificationURL() string
+	ResetPasswordEmailTemplateId() string
+	ResetPasswordURL() string
 }
 
 type sendgridConfig struct {
@@ -23,6 +25,14 @@ func (cfg *sendgridConfig) VerifyEmailTemplateId() string {
 	return cfg.env.SendGridVerifyEmailTemplateId
 }
 
+func (cfg *sendgridConfig) ResetPasswordEmailTemplateId() string {
+	return cfg.env.SendGridResetPasswordEmailTemplateId
+}
+
 func (cfg *sendgridConfig) VerificationURL() string {
 	return cfg.env.VerificationURL
+}
+
+func (cfg *sendgridConfig) ResetPasswordURL() string {
+	return cfg.env.ResetPasswordURL
 }

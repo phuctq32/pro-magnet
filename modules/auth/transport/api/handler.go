@@ -13,6 +13,8 @@ type AuthUseCase interface {
 	RefreshAccessToken(ctx context.Context, refreshToken string) (*string, error)
 	GoogleOAuthData() (*authmodel.GoogleOAuthData, error)
 	LoginWithGoogle(ctx context.Context, code string) (*authmodel.LoginResponse, error)
+	ForgotPassword(ctx context.Context, email string) error
+	ResetPassword(ctx context.Context, resetToken, newPassword string) error
 }
 
 type authHandler struct {
