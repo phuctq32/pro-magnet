@@ -34,7 +34,9 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		sgMailer,
 		appCtx.EnvConfigs().Sendgrid().FromEmail(),
 		appCtx.EnvConfigs().Sendgrid().VerifyEmailTemplateId(),
+		appCtx.EnvConfigs().Sendgrid().ResetPasswordEmailTemplateId(),
 		appCtx.EnvConfigs().Sendgrid().VerificationURL(),
+		appCtx.EnvConfigs().Sendgrid().ResetPasswordURL(),
 		jwtProvider,
 		appCtx.EnvConfigs().App().AccessSecret(),
 		appCtx.EnvConfigs().App().RefreshSecret(),
@@ -54,5 +56,7 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		authRouter.POST("/refresh", authHdl.Refresh(appCtx))
 		authRouter.GET("/google", authHdl.LoginWithGoogle(appCtx))
 		authRouter.GET("/google/callback", authHdl.LoginWithGoogleCallback(appCtx))
+		authRouter.POST("/forgot-password", authHdl.ForgotPassword(appCtx))
+		authRouter.POST("/reset-password", authHdl.ResetPassword(appCtx))
 	}
 }

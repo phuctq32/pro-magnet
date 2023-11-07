@@ -7,8 +7,8 @@ import (
 	authmodel "pro-magnet/modules/auth/model"
 )
 
-func (redisRepo *authRedisRepository) GetVerifiedUserId(ctx context.Context, verifiedToken string) (*string, error) {
-	userId, err := redisRepo.cli.Get(ctx, authmodel.VerifiedTokenPrefix+verifiedToken).Result()
+func (redisRepo *authRedisRepository) GetResetPasswordEmail(ctx context.Context, resetToken string) (*string, error) {
+	email, err := redisRepo.cli.Get(ctx, authmodel.ResetTokenPrefix+resetToken).Result()
 	if err != nil {
 		if err == redis.Nil {
 			return nil, nil
@@ -16,5 +16,5 @@ func (redisRepo *authRedisRepository) GetVerifiedUserId(ctx context.Context, ver
 		return nil, common.NewServerErr(err)
 	}
 
-	return &userId, nil
+	return &email, nil
 }

@@ -3,13 +3,12 @@ package authrepo
 import (
 	"context"
 	"pro-magnet/common"
+	authmodel "pro-magnet/modules/auth/model"
 	"time"
 )
 
-const VerifiedTokenPrefix string = "verified-token:"
-
 func (redisRepo *authRedisRepository) SetVerifiedToken(ctx context.Context, token, userId string) error {
-	if err := redisRepo.cli.Set(ctx, VerifiedTokenPrefix+token, userId, 30*time.Minute).Err(); err != nil {
+	if err := redisRepo.cli.Set(ctx, authmodel.VerifiedTokenPrefix+token, userId, 30*time.Minute).Err(); err != nil {
 		return common.NewServerErr(err)
 	}
 

@@ -15,6 +15,10 @@ func (uc *authUseCase) Login(ctx context.Context, data *authmodel.LoginUser) (*a
 		return nil, err
 	}
 
+	if user.Type != usermodel.InternalUser {
+		return nil, common.NewNotFoundErr("user", usermodel.ErrUserNotFound)
+	}
+
 	if !uc.hasher.Compare(*user.Password, data.Password) {
 		return nil, common.NewBadRequestErr(errors.New("email or password invalid"))
 	}
