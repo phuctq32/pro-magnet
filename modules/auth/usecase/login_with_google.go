@@ -2,28 +2,11 @@ package authuc
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/base64"
 	"pro-magnet/common"
 	authmodel "pro-magnet/modules/auth/model"
 	usermodel "pro-magnet/modules/user/model"
 	"time"
 )
-
-func (uc *authUseCase) GoogleOAuthData() (*authmodel.GoogleOAuthData, error) {
-	b := make([]byte, 32)
-	if _, err := rand.Read(b); err != nil {
-		return nil, common.NewServerErr(err)
-	}
-
-	state := base64.StdEncoding.EncodeToString(b)
-
-	return &authmodel.GoogleOAuthData{
-		Url:             uc.ggOauth.AuthURL(state),
-		State:           state,
-		StateExpiration: time.Minute * 30,
-	}, nil
-}
 
 func (uc *authUseCase) LoginWithGoogle(
 	ctx context.Context, code string,

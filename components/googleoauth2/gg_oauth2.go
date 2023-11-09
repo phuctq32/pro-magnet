@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	ggoauthmodel "pro-magnet/components/googleoauth2/model"
@@ -60,7 +60,6 @@ func (ggo *googleOauth2) UserInfoFromCode(ctx context.Context, code string) (*gg
 	if err := json.Unmarshal(b, &resBody); err != nil {
 		return nil, errors.New("can not unmarshal response body")
 	}
-	log.Println(resBody)
 
 	// Convert response data to google user
 	ggUser := &ggoauthmodel.User{}
@@ -92,7 +91,7 @@ func (ggo *googleOauth2) UserInfoFromCode(ctx context.Context, code string) (*gg
 		*ggUser.Phonenumber = resBody.PhoneNumbers[0].Value
 	}
 
-	log.Println(*ggUser)
+	log.Debug().Interface("gguser", *ggUser).Msg("")
 
 	return ggUser, nil
 }
