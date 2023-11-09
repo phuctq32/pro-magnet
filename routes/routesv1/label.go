@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"pro-magnet/components/appcontext"
 	"pro-magnet/middlewares"
-	labelrepo "pro-magnet/modules/label/repository"
+	labelrepo "pro-magnet/modules/label/repository/mongo"
 	labelapi "pro-magnet/modules/label/transport/api"
 	labeluc "pro-magnet/modules/label/usecase"
 )

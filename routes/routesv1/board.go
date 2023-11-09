@@ -4,10 +4,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"pro-magnet/components/appcontext"
 	"pro-magnet/middlewares"
-	boardrepo "pro-magnet/modules/board/repository"
+	boardrepo "pro-magnet/modules/board/repository/mongo"
 	boardapi "pro-magnet/modules/board/transport/api"
 	boarduc "pro-magnet/modules/board/usecase"
-	wsrepo "pro-magnet/modules/workspace/repository"
+	wsrepo "pro-magnet/modules/workspace/repository/mongo"
 )
 
 func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
