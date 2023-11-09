@@ -54,8 +54,7 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		authRouter.POST("/send-verification-email", authHdl.SendVerificationEmail(appCtx))
 		authRouter.POST("/login", authHdl.Login(appCtx))
 		authRouter.POST("/refresh", authHdl.Refresh(appCtx))
-		authRouter.GET("/google", authHdl.LoginWithGoogle(appCtx))
-		authRouter.GET("/google/callback", authHdl.LoginWithGoogleCallback(appCtx))
+		authRouter.POST("/google-login", authHdl.LoginWithGoogle(appCtx))
 		authRouter.POST("/forgot-password", authHdl.ForgotPassword(appCtx))
 		authRouter.POST("/reset-password", authHdl.ResetPassword(appCtx))
 	}
