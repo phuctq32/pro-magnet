@@ -11,11 +11,13 @@ import (
 
 func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	cardRepo := mongo.NewCardRepository(appCtx.DBConnection())
-	cardUC := carduc.NewCardUseCase(cardRepo)
+	cardDataAggregator := carduc.NewCardDataAggregator(appCtx.AsyncGroup())
+	cardUC := carduc.NewCardUseCase(cardRepo, cardDataAggregator)
 	cardHdl := cardapi.NewCardHandler(cardUC)
 
 	cardRouter := router.Group("/cards", middlewares.Authorize(appCtx))
 	{
+		cardRouter.GET("/:id", cardHdl.GetCardById(appCtx))
 		cardRouter.POST("", cardHdl.CreateCard(appCtx))
 	}
 }
