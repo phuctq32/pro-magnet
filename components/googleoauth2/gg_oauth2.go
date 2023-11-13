@@ -18,12 +18,11 @@ type googleOauth2 struct {
 	cfg *oauth2.Config
 }
 
-func NewGoogleOAuth2(clientId, clientSecret, redirectUrl string) GoogleOAuth {
+func NewGoogleOAuth2(clientId, clientSecret string) GoogleOAuth {
 	return &googleOauth2{cfg: &oauth2.Config{
 		ClientID:     clientId,
 		ClientSecret: clientSecret,
 		Endpoint:     google.Endpoint,
-		RedirectURL:  redirectUrl,
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
@@ -38,7 +37,10 @@ func (ggo *googleOauth2) AuthURL(state string) string {
 }
 
 func (ggo *googleOauth2) UserInfoFromCode(ctx context.Context, code string) (*ggoauthmodel.User, error) {
-	token, _ := ggo.cfg.Exchange(ctx, code)
+	token, err := ggo.cfg.Exchange(ctx, code)
+	if err != nil {
+		return nil, err
+	}
 
 	req, _ := http.NewRequestWithContext(ctx, "GET", "https://people.googleapis.com/v1/people/me", nil)
 	reqQuery := url.Values{}

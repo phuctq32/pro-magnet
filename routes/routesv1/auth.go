@@ -20,7 +20,6 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	ggOauth := ggoauth2.NewGoogleOAuth2(
 		appCtx.EnvConfigs().GoogleOAuth().ClientId(),
 		appCtx.EnvConfigs().GoogleOAuth().ClientSecret(),
-		appCtx.EnvConfigs().GoogleOAuth().RedirectUri(),
 	)
 	hasher := hasher2.NewBcryptHash(10)
 	sgMailer := sendgrid.NewSendGridProvider(appCtx.EnvConfigs().Sendgrid().ApiKey())
