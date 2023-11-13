@@ -19,5 +19,6 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	{
 		cardRouter.GET("/:id", cardHdl.GetCardById(appCtx))
 		cardRouter.POST("", cardHdl.CreateCard(appCtx))
+		cardRouter.PATCH("/:id", cardHdl.UpdateCardById(appCtx))
 	}
 }

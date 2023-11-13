@@ -44,7 +44,6 @@ type envConfigs struct {
 	// Google OAuth2
 	GoogleOauthClientId     string `mapstructure:"GOOGLE_OAUTH_CLIENT_ID"`
 	GoogleOauthClientSecret string `mapstructure:"GOOGLE_OAUTH_CLIENT_SECRET"`
-	GoogleOauthRedirectUri  string `mapstructure:"GOOGLE_OAUTH_REDIRECT_URI"`
 }
 
 func LoadEnvConfigs(env string) *envConfigs {
