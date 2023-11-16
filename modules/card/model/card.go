@@ -1,14 +1,18 @@
 package cardmodel
 
 import (
+	camodel "pro-magnet/modules/cardattachment/model"
 	labelmodel "pro-magnet/modules/label/model"
 	"time"
 )
+
+type CardStatus uint8
 
 type Card struct {
 	Id          *string         `json:"_id,omitempty" bson:"_id,omitempty"`
 	CreatedAt   time.Time       `json:"createdAt" bson:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt" bson:"updatedAt"`
+	Status      CardStatus      `json:"-" bson:"status"`
 	ColumnId    string          `json:"columnId" bson:"columnId"`
 	BoardId     string          `json:"boardId" bson:"boardId"`
 	Title       string          `json:"title" bson:"title"`
@@ -22,6 +26,6 @@ type Card struct {
 	IsDone      bool            `json:"isDone" bson:"isDone"`
 
 	// Aggregated data
-	Labels      []labelmodel.Label `json:"labels"`
-	Attachments []CardAttachment   `json:"attachments"`
+	Labels      []labelmodel.Label       `json:"labels"`
+	Attachments []camodel.CardAttachment `json:"attachments"`
 }

@@ -23,6 +23,7 @@ func NewGoogleOAuth2(clientId, clientSecret string) GoogleOAuth {
 		ClientID:     clientId,
 		ClientSecret: clientSecret,
 		Endpoint:     google.Endpoint,
+		RedirectURL:  "postmessage",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",

@@ -25,6 +25,7 @@ func (repo *cardRepository) Create(
 		Id:         &insertedId,
 		CreatedAt:  insertData.CreatedAt,
 		UpdatedAt:  insertData.UpdatedAt,
+		Status:     insertData.Status,
 		ColumnId:   data.ColumnId,
 		BoardId:    data.BoardId,
 		Title:      data.Title,

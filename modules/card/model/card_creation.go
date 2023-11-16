@@ -15,6 +15,7 @@ type CardInsert struct {
 	Id          *primitive.ObjectID  `bson:"_id,omitempty"`
 	CreatedAt   time.Time            `bson:"createdAt"`
 	UpdatedAt   time.Time            `bson:"updatedAt"`
+	Status      CardStatus           `bson:"status"`
 	ColumnId    primitive.ObjectID   `bson:"columnId"`
 	BoardId     primitive.ObjectID   `bson:"boardId"`
 	Title       string               `bson:"title"`
@@ -44,6 +45,7 @@ func (cc *CardCreation) ToCardInsert() (*CardInsert, error) {
 	return &CardInsert{
 		CreatedAt:   now,
 		UpdatedAt:   now,
+		Status:      Active,
 		ColumnId:    columnOid,
 		BoardId:     boardOid,
 		Title:       cc.Title,
