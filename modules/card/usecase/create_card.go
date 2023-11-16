@@ -3,6 +3,7 @@ package carduc
 import (
 	"context"
 	cardmodel "pro-magnet/modules/card/model"
+	camodel "pro-magnet/modules/cardattachment/model"
 	labelmodel "pro-magnet/modules/label/model"
 )
 
@@ -19,6 +20,6 @@ func (uc *cardUseCase) CreateCard(
 		return nil, err
 	}
 	newCard.Labels = []labelmodel.Label{}
-	newCard.Attachments = []cardmodel.CardAttachment{}
+	newCard.Attachments = []camodel.CardAttachment{}
 	return newCard, nil
 }
