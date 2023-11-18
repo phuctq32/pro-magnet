@@ -1,0 +1,30 @@
+package cardchecklistuc
+
+import (
+	"golang.org/x/net/context"
+	cardmodel "pro-magnet/modules/card/model"
+	cardchecklistmodel "pro-magnet/modules/cardchecklist/model"
+)
+
+type CardRepository interface {
+	FindById(ctx context.Context, id string) (*cardmodel.Card, error)
+}
+
+type CardChecklistRepository interface {
+	Create(ctx context.Context, cardId string, data *cardchecklistmodel.CardChecklist) error
+}
+
+type cardChecklistUseCase struct {
+	ccRepo   CardChecklistRepository
+	cardRepo CardRepository
+}
+
+func NewCardChecklistUseCase(
+	ccRepo CardChecklistRepository,
+	cardRepo CardRepository,
+) *cardChecklistUseCase {
+	return &cardChecklistUseCase{
+		ccRepo:   ccRepo,
+		cardRepo: cardRepo,
+	}
+}

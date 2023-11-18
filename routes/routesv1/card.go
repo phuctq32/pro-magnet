@@ -17,8 +17,8 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 
 	cardRouter := router.Group("/cards", middlewares.Authorize(appCtx))
 	{
-		cardRouter.GET("/:id", cardHdl.GetCardById(appCtx))
+		cardRouter.GET("/:cardId", cardHdl.GetCardById(appCtx))
 		cardRouter.POST("", cardHdl.CreateCard(appCtx))
-		cardRouter.PATCH("/:id", cardHdl.UpdateCardById(appCtx))
+		cardRouter.PATCH("/:cardId", cardHdl.UpdateCardById(appCtx))
 	}
 }

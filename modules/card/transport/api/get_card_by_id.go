@@ -13,7 +13,7 @@ func (hdl *cardHandler) GetCardById(appCtx appcontext.AppContext) gin.HandlerFun
 		data := struct {
 			CardId string `json:"cardId" validate:"required,mongodb"`
 		}{
-			CardId: strings.TrimSpace(c.Param("id")),
+			CardId: strings.TrimSpace(c.Param("cardId")),
 		}
 
 		if errs := appCtx.Validator().Validate(&data); errs != nil {

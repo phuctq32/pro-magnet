@@ -1,17 +1,15 @@
-package cardapi
+package cardchecklistapi
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"net/http"
 	"pro-magnet/common"
 	"pro-magnet/components/appcontext"
-	cardmodel "pro-magnet/modules/card/model"
-	"reflect"
+	cardchecklistmodel "pro-magnet/modules/cardchecklist/model"
 	"strings"
 )
 
-func (hdl *cardHandler) UpdateCardById(appCtx appcontext.AppContext) gin.HandlerFunc {
+func (hdl *cardChecklistHandler) CreateChecklist(appCtx appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cardIdData := struct {
 			CardId string `json:"cardId" validate:"required,mongodb"`
@@ -23,7 +21,7 @@ func (hdl *cardHandler) UpdateCardById(appCtx appcontext.AppContext) gin.Handler
 			panic(common.NewValidationErrors(errs))
 		}
 
-		var data cardmodel.CardUpdate
+		var data cardchecklistmodel.CardChecklist
 
 		if err := c.ShouldBind(&data); err != nil {
 			panic(common.NewBadRequestErr(err))
@@ -33,15 +31,10 @@ func (hdl *cardHandler) UpdateCardById(appCtx appcontext.AppContext) gin.Handler
 			panic(common.NewValidationErrors(errs))
 		}
 
-		if reflect.ValueOf(data).IsZero() {
-			panic(common.NewBadRequestErr(errors.New("invalid request")))
-		}
-
-		card, err := hdl.uc.UpdateCardById(c.Request.Context(), cardIdData.CardId, &data)
-		if err != nil {
+		if err := hdl.uc.CreateChecklist(c.Request.Context(), cardIdData.CardId, &data); err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusCreated, common.NewResponse("updated card successfully", card))
+		c.JSON(http.StatusOK, common.NewResponse("successfully created checklist", nil))
 	}
 }
