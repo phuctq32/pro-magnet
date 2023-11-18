@@ -19,6 +19,6 @@ func NewCardAttachmentRouter(appCtx appcontext.AppContext, router *gin.RouterGro
 	caRouter := router.Group("/cards/:cardId/attachments", middlewares.Authorize(appCtx))
 	{
 		caRouter.POST("", caHdl.AddCardAttachment(appCtx))
-		caRouter.DELETE("/:id", caHdl.RemoveCardAttachment(appCtx))
+		caRouter.DELETE("/:attachmentId", caHdl.RemoveCardAttachment(appCtx))
 	}
 }

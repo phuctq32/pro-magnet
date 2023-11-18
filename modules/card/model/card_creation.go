@@ -2,6 +2,7 @@ package cardmodel
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	cardchecklistmodel "pro-magnet/modules/cardchecklist/model"
 	"time"
 )
 
@@ -12,21 +13,21 @@ type CardCreation struct {
 }
 
 type CardInsert struct {
-	Id          *primitive.ObjectID  `bson:"_id,omitempty"`
-	CreatedAt   time.Time            `bson:"createdAt"`
-	UpdatedAt   time.Time            `bson:"updatedAt"`
-	Status      CardStatus           `bson:"status"`
-	ColumnId    primitive.ObjectID   `bson:"columnId"`
-	BoardId     primitive.ObjectID   `bson:"boardId"`
-	Title       string               `bson:"title"`
-	Description string               `bson:"description"`
-	Cover       *string              `bson:"cover,omitempty"`
-	MemberIds   []primitive.ObjectID `bson:"memberIds"`
-	Checklists  []CardChecklist      `bson:"checklists"`
-	Comments    []CardComment        `bson:"comments"`
-	StartDate   *time.Time           `bson:"startDate,omitempty"`
-	EndDate     *time.Time           `bson:"endDate,omitempty"`
-	IsDone      bool                 `bson:"isDone"`
+	Id          *primitive.ObjectID                `bson:"_id,omitempty"`
+	CreatedAt   time.Time                          `bson:"createdAt"`
+	UpdatedAt   time.Time                          `bson:"updatedAt"`
+	Status      CardStatus                         `bson:"status"`
+	ColumnId    primitive.ObjectID                 `bson:"columnId"`
+	BoardId     primitive.ObjectID                 `bson:"boardId"`
+	Title       string                             `bson:"title"`
+	Description string                             `bson:"description"`
+	Cover       *string                            `bson:"cover,omitempty"`
+	MemberIds   []primitive.ObjectID               `bson:"memberIds"`
+	Checklists  []cardchecklistmodel.CardChecklist `bson:"checklists"`
+	Comments    []CardComment                      `bson:"comments"`
+	StartDate   *time.Time                         `bson:"startDate,omitempty"`
+	EndDate     *time.Time                         `bson:"endDate,omitempty"`
+	IsDone      bool                               `bson:"isDone"`
 }
 
 func (cc *CardCreation) ToCardInsert() (*CardInsert, error) {
@@ -52,7 +53,7 @@ func (cc *CardCreation) ToCardInsert() (*CardInsert, error) {
 		Description: "",
 		Cover:       nil,
 		MemberIds:   []primitive.ObjectID{},
-		Checklists:  []CardChecklist{},
+		Checklists:  []cardchecklistmodel.CardChecklist{},
 		Comments:    []CardComment{},
 		StartDate:   nil,
 		EndDate:     nil,
