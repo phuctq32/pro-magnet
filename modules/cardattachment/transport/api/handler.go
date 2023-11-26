@@ -6,8 +6,8 @@ import (
 )
 
 type CardAttachmentUseCase interface {
-	AddCardAttachment(ctx context.Context, data *camodel.CardAttachment) (*camodel.CardAttachment, error)
-	RemoveCardAttachment(ctx context.Context, cardId, id string) error
+	AddCardAttachment(ctx context.Context, userId string, data *camodel.CardAttachment) (*camodel.CardAttachment, error)
+	RemoveCardAttachment(ctx context.Context, userId, cardId, cardAttachmentId string) error
 }
 
 type cardAttachmentHandler struct {

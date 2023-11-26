@@ -12,17 +12,19 @@ func (hdl *cardAttachmentHandler) RemoveCardAttachment(appCtx appcontext.AppCont
 	return func(c *gin.Context) {
 		data := struct {
 			CardId       string `json:"cardId" validate:"required,mongodb"`
-			AttachmentId string `json:"id" validate:"required,mongodb"`
+			AttachmentId string `json:"attachmentId" validate:"required,mongodb"`
 		}{
 			CardId:       strings.TrimSpace(c.Param("cardId")),
-			AttachmentId: strings.TrimSpace(c.Param("id")),
+			AttachmentId: strings.TrimSpace(c.Param("attachmentId")),
 		}
 
 		if errs := appCtx.Validator().Validate(&data); errs != nil {
 			panic(common.NewValidationErrors(errs))
 		}
 
-		if err := hdl.uc.RemoveCardAttachment(c.Request.Context(), data.CardId, data.AttachmentId); err != nil {
+		userId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
+
+		if err := hdl.uc.RemoveCardAttachment(c.Request.Context(), userId, data.CardId, data.AttachmentId); err != nil {
 			panic(err)
 		}
 
