@@ -1,8 +1,7 @@
-package carduc
+package columnuc
 
 import (
-	"context"
-	cardmodel "pro-magnet/modules/card/model"
+	"golang.org/x/net/context"
 	columnmodel "pro-magnet/modules/column/model"
 )
 
@@ -10,35 +9,32 @@ type BoardMemberRepository interface {
 	IsBoardMember(ctx context.Context, boardId, userId string) (bool, error)
 }
 
-type ColumnRepository interface {
-	FindById(ctx context.Context, id string) (*columnmodel.Column, error)
-	UpdateById(ctx context.Context, id string, updateData *columnmodel.ColumnUpdate) (*columnmodel.Column, error)
+type CardRepository interface {
+	DeleteByIds(ctx context.Context, ids []string) error
 }
 
-type CardRepository interface {
-	Create(ctx context.Context, data *cardmodel.CardCreation) (*cardmodel.Card, error)
-	FindById(ctx context.Context, id string) (*cardmodel.Card, error)
-	UpdateById(ctx context.Context, id string, updateData *cardmodel.CardUpdate) (*cardmodel.Card, error)
+type ColumnRepository interface {
+	Create(ctx context.Context, data *columnmodel.ColumnCreate) (*columnmodel.Column, error)
+	DeleteById(ctx context.Context, id string) error
+	FindById(ctx context.Context, id string) (*columnmodel.Column, error)
+	UpdateById(ctx context.Context, id string, updateData *columnmodel.ColumnUpdate) (*columnmodel.Column, error)
 	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 
-type cardUseCase struct {
-	cardRepo CardRepository
+type columnUseCase struct {
 	colRepo  ColumnRepository
 	bmRepo   BoardMemberRepository
-	cardAgg  CardDataAggregator
+	cardRepo CardRepository
 }
 
-func NewCardUseCase(
-	cardRepo CardRepository,
+func NewColumnUseCase(
 	colRepo ColumnRepository,
 	bmRepo BoardMemberRepository,
-	cardAgg CardDataAggregator,
-) *cardUseCase {
-	return &cardUseCase{
-		cardRepo: cardRepo,
+	cardRepo CardRepository,
+) *columnUseCase {
+	return &columnUseCase{
 		colRepo:  colRepo,
 		bmRepo:   bmRepo,
-		cardAgg:  cardAgg,
+		cardRepo: cardRepo,
 	}
 }
