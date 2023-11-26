@@ -4,15 +4,19 @@ import (
 	"github.com/gin-gonic/gin"
 	"pro-magnet/components/appcontext"
 	"pro-magnet/middlewares"
+	boardmemberrepo "pro-magnet/modules/boardmember/repository/mongo"
 	"pro-magnet/modules/card/repository/mongo"
 	cardapi "pro-magnet/modules/card/transport/api"
 	carduc "pro-magnet/modules/card/usecase"
+	columnrepo "pro-magnet/modules/column/repository/mongo"
 )
 
 func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	cardRepo := mongo.NewCardRepository(appCtx.DBConnection())
+	colRepo := columnrepo.NewColumnRepository(appCtx.DBConnection())
+	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
 	cardDataAggregator := carduc.NewCardDataAggregator(appCtx.AsyncGroup())
-	cardUC := carduc.NewCardUseCase(cardRepo, cardDataAggregator)
+	cardUC := carduc.NewCardUseCase(cardRepo, colRepo, bmRepo, cardDataAggregator)
 	cardHdl := cardapi.NewCardHandler(cardUC)
 
 	cardRouter := router.Group("/cards", middlewares.Authorize(appCtx))

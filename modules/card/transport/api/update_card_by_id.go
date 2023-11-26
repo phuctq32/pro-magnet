@@ -37,7 +37,9 @@ func (hdl *cardHandler) UpdateCardById(appCtx appcontext.AppContext) gin.Handler
 			panic(common.NewBadRequestErr(errors.New("invalid request")))
 		}
 
-		card, err := hdl.uc.UpdateCardById(c.Request.Context(), cardIdData.CardId, &data)
+		userId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
+
+		card, err := hdl.uc.UpdateCardById(c.Request.Context(), userId, cardIdData.CardId, &data)
 		if err != nil {
 			panic(err)
 		}
