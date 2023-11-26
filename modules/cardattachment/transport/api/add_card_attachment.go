@@ -32,7 +32,9 @@ func (hdl *cardAttachmentHandler) AddCardAttachment(appCtx appcontext.AppContext
 			panic(common.NewValidationErrors(errs))
 		}
 
-		ca, err := hdl.uc.AddCardAttachment(c.Request.Context(), &data)
+		userId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
+
+		ca, err := hdl.uc.AddCardAttachment(c.Request.Context(), userId, &data)
 		if err != nil {
 			panic(err)
 		}
