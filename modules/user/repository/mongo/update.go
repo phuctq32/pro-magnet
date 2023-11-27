@@ -71,3 +71,17 @@ func (repo *userRepository) UpdatePasswordByEmail(
 
 	return nil
 }
+
+func (repo *userRepository) UpdatePasswordById(
+	ctx context.Context,
+	id string,
+	password string,
+) error {
+	if _, err := repo.UpdateById(
+		ctx, id,
+		map[string]interface{}{"password": password}); err != nil {
+		return err
+	}
+
+	return nil
+}
