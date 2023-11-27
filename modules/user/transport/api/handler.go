@@ -8,6 +8,7 @@ import (
 type UserUseCase interface {
 	GetUser(ctx context.Context, userId string) (*usermodel.User, error)
 	ChangePassword(ctx context.Context, userId string, data *usermodel.UserChangePassword) error
+	UpdateUser(ctx context.Context, userId string, data *usermodel.UserUpdate) (*usermodel.User, error)
 }
 
 type userHandler struct {

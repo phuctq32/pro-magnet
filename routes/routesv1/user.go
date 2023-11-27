@@ -18,6 +18,7 @@ func NewUserRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 
 	userRouter := router.Group("/users", middlewares.Authorize(appCtx))
 	{
+		userRouter.PATCH("/me", userHdl.UpdateUser(appCtx))
 		userRouter.GET("/me", userHdl.GetProfile(appCtx))
 		userRouter.PATCH("/me/change-password", userHdl.ChangePassword(appCtx))
 	}

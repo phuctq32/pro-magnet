@@ -11,45 +11,27 @@ import (
 	usermodel "pro-magnet/modules/user/model"
 )
 
-func (repo *userRepository) Update(
-	ctx context.Context,
-	filter map[string]interface{},
-	updateData map[string]interface{},
-) (*usermodel.User, error) {
-	var updatedUser usermodel.User
-
-	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
-	if err := repo.db.
-		Collection(usermodel.UserCollectionName).
-		FindOneAndUpdate(ctx, filter, bson.M{
-			"$set": updateData,
-			"$currentDate": bson.M{
-				"updatedAt": bson.M{"$type": "date"},
-			},
-		}, opts).Decode(&updatedUser); err != nil {
-		if errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, common.NewNotFoundErr("user", err)
-		}
-		return nil, common.NewServerErr(err)
-	}
-
-	return &updatedUser, nil
-}
-
 func (repo *userRepository) UpdateById(
 	ctx context.Context,
 	id string,
-	updateData map[string]interface{},
+	updateData *usermodel.UserUpdate,
 ) (*usermodel.User, error) {
 	oid, _ := primitive.ObjectIDFromHex(id)
-	return repo.Update(ctx, bson.M{"_id": oid}, updateData)
+	return updateUser(ctx, repo.db, bson.M{"_id": oid}, updateData)
 }
 
 func (repo *userRepository) SetEmailVerified(
 	ctx context.Context,
 	id string,
 ) error {
-	if _, err := repo.UpdateById(ctx, id, map[string]interface{}{"isVerified": true}); err != nil {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	if _, err = updateUser(
+		ctx, repo.db,
+		map[string]interface{}{"_id": oid},
+		map[string]interface{}{"isVerified": true}); err != nil {
 		return err
 	}
 
@@ -61,8 +43,9 @@ func (repo *userRepository) UpdatePasswordByEmail(
 	email string,
 	password string,
 ) error {
-	if _, err := repo.Update(
+	if _, err := updateUser(
 		ctx,
+		repo.db,
 		map[string]interface{}{"email": email},
 		map[string]interface{}{"password": password},
 	); err != nil {
@@ -77,11 +60,42 @@ func (repo *userRepository) UpdatePasswordById(
 	id string,
 	password string,
 ) error {
-	if _, err := repo.UpdateById(
-		ctx, id,
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	if _, err := updateUser(
+		ctx, repo.db,
+		map[string]interface{}{"_id": oid},
 		map[string]interface{}{"password": password}); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func updateUser[T *usermodel.UserUpdate | map[string]interface{}](
+	ctx context.Context,
+	db *mongo.Database,
+	filter map[string]interface{},
+	updateData T,
+) (*usermodel.User, error) {
+	var updatedUser usermodel.User
+
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+	if err := db.
+		Collection(usermodel.UserCollectionName).
+		FindOneAndUpdate(ctx, filter, bson.M{
+			"$set": updateData,
+			"$currentDate": bson.M{
+				"updatedAt": bson.M{"$type": "date"},
+			},
+		}, opts).Decode(&updatedUser); err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, common.NewNotFoundErr("user", err)
+		}
+		return nil, common.NewServerErr(err)
+	}
+
+	return &updatedUser, nil
 }

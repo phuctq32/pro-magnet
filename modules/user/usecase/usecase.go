@@ -9,6 +9,7 @@ import (
 type UserRepository interface {
 	FindById(ctx context.Context, id string) (*usermodel.User, error)
 	UpdatePasswordById(ctx context.Context, id, password string) error
+	UpdateById(ctx context.Context, id string, updateData *usermodel.UserUpdate) (*usermodel.User, error)
 }
 
 type userUseCase struct {
