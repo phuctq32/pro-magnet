@@ -24,7 +24,7 @@ func (repo *boardMemberRepository) IsBoardMember(
 	}
 
 	count, err := repo.db.
-		Collection(model.BoardMemberCollectionName).
+		Collection(bmmodel.BoardMemberCollectionName).
 		CountDocuments(ctx, bson.M{
 			"boardId": boardOid,
 			"userId":  userOid,

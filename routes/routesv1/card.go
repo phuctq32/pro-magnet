@@ -8,6 +8,7 @@ import (
 	"pro-magnet/modules/card/repository/mongo"
 	cardapi "pro-magnet/modules/card/transport/api"
 	carduc "pro-magnet/modules/card/usecase"
+	carepo "pro-magnet/modules/cardattachment/repository/mongo"
 	columnrepo "pro-magnet/modules/column/repository/mongo"
 )
 
@@ -15,7 +16,8 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	cardRepo := mongo.NewCardRepository(appCtx.DBConnection())
 	colRepo := columnrepo.NewColumnRepository(appCtx.DBConnection())
 	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
-	cardDataAggregator := carduc.NewCardDataAggregator(appCtx.AsyncGroup())
+	caRepo := carepo.NewCardAttachmentRepository(appCtx.DBConnection())
+	cardDataAggregator := carduc.NewCardDataAggregator(appCtx.AsyncGroup(), caRepo)
 	cardUC := carduc.NewCardUseCase(cardRepo, colRepo, bmRepo, cardDataAggregator)
 	cardHdl := cardapi.NewCardHandler(cardUC)
 

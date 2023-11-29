@@ -22,6 +22,10 @@ type CardRepository interface {
 	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 
+type CardDataAggregator interface {
+	Aggregate(ctx context.Context, card *cardmodel.Card) error
+}
+
 type cardUseCase struct {
 	cardRepo CardRepository
 	colRepo  ColumnRepository
