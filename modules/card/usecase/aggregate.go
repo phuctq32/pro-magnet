@@ -8,17 +8,22 @@ import (
 	labelmodel "pro-magnet/modules/label/model"
 )
 
-type CardDataAggregator interface {
-	Aggregate(ctx context.Context, card *cardmodel.Card) error
+type CardAttachmentRepo interface {
+	ListByCardId(ctx context.Context, status camodel.CardAttachmentStatus, id string) ([]camodel.CardAttachment, error)
 }
 
 type cardDataAggregator struct {
-	asyng asyncgroup.AsyncGroup
+	asyng  asyncgroup.AsyncGroup
+	caRepo CardAttachmentRepo
 }
 
-func NewCardDataAggregator(asyng asyncgroup.AsyncGroup) *cardDataAggregator {
+func NewCardDataAggregator(
+	asyng asyncgroup.AsyncGroup,
+	caRepo CardAttachmentRepo,
+) *cardDataAggregator {
 	return &cardDataAggregator{
-		asyng: asyng,
+		asyng:  asyng,
+		caRepo: caRepo,
 	}
 }
 
@@ -50,7 +55,13 @@ func (agg *cardDataAggregator) aggregateAttachments(
 	card *cardmodel.Card,
 ) func(context.Context) error {
 	return func(ctx context.Context) error {
-		card.Attachments = []camodel.CardAttachment{}
+		attachments, err := agg.caRepo.ListByCardId(ctx, 1, *card.Id)
+		if err != nil {
+			return err
+		}
+		card.Attachments = make([]camodel.CardAttachment, 0)
+
+		card.Attachments = attachments
 		return nil
 	}
 }
