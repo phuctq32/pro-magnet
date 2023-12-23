@@ -8,6 +8,7 @@ import (
 type CardChecklistUseCase interface {
 	CreateChecklist(ctx context.Context, cardId string, data *cardchecklistmodel.CardChecklist) error
 	UpdateChecklist(ctx context.Context, cardId, checklistId string, data *cardchecklistmodel.CardChecklistUpdate) error
+	DeleteChecklist(ctx context.Context, cardId, checklistId string) error
 }
 
 type cardChecklistHandler struct {
