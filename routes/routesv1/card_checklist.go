@@ -18,7 +18,7 @@ func NewCardChecklistRouter(appCtx appcontext.AppContext, router *gin.RouterGrou
 
 	ccRouter := router.Group("/cards/:cardId/checklists", middlewares.Authorize(appCtx))
 	{
-		ccRouter.POST("/:checklistId/items")
+		ccRouter.POST("/:checklistId/items", ccHdl.CreateChecklistItem(appCtx))
 		ccRouter.PATCH("/:checklistId/items/:itemId")
 		ccRouter.DELETE("/:checklistId/items/:itemId")
 
