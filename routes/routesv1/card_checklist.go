@@ -23,7 +23,7 @@ func NewCardChecklistRouter(appCtx appcontext.AppContext, router *gin.RouterGrou
 		ccRouter.DELETE("/:checklistId/items/:itemId")
 
 		ccRouter.POST("", ccHdl.CreateChecklist(appCtx))
-		ccRouter.PATCH("/:checklistId")
+		ccRouter.PATCH("/:checklistId", ccHdl.UpdateCardChecklist(appCtx))
 		ccRouter.DELETE("/:checklistId")
 	}
 }
