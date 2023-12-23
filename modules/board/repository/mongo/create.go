@@ -22,7 +22,6 @@ func (repo *boardRepository) Create(
 		Name:           data.Name,
 		WorkspaceId:    wsOid,
 		AdminId:        adminOid,
-		MemberIds:      []primitive.ObjectID{adminOid},
 		ColumnOrderIds: []primitive.ObjectID{},
 	}
 
@@ -42,7 +41,6 @@ func (repo *boardRepository) Create(
 		Name:           boardInsert.Name,
 		WorkspaceId:    data.WorkspaceId,
 		AdminId:        data.UserId,
-		MemberIds:      []string{data.UserId},
 		ColumnOrderIds: []string{},
 	}, nil
 }

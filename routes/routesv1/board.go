@@ -10,14 +10,16 @@ import (
 	boardmemberrepo "pro-magnet/modules/boardmember/repository/mongo"
 	bmapi "pro-magnet/modules/boardmember/transport/api"
 	bmuc "pro-magnet/modules/boardmember/usecase"
+	userrepo "pro-magnet/modules/user/repository/mongo"
 	wsrepo "pro-magnet/modules/workspace/repository/mongo"
 )
 
 func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	boardRepo := boardrepo.NewBoardRepository(appCtx.DBConnection())
+	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
 	wsRepo := wsrepo.NewWorkspaceRepository(appCtx.DBConnection())
 
-	boardUC := boarduc.NewBoardUseCase(boardRepo, wsRepo, appCtx.AsyncGroup())
+	boardUC := boarduc.NewBoardUseCase(boardRepo, bmRepo, wsRepo, appCtx.AsyncGroup())
 
 	boardHdl := boardapi.NewBoardHandler(boardUC)
 
@@ -26,12 +28,14 @@ func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		boardRouter.POST("", boardHdl.CreateBoard(appCtx))
 	}
 
-	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
-	bmUC := bmuc.NewBoardMemberUseCase(bmRepo)
+	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
+	bmUC := bmuc.NewBoardMemberUseCase(bmRepo, boardRepo, userRepo, appCtx.AsyncGroup())
 	bmHdl := bmapi.NewBoardMemberHandler(bmUC)
 
 	boardMemberRouter := boardRouter.Group("/:boardId/members")
 	{
 		boardMemberRouter.PATCH("", bmHdl.AddMember(appCtx))
+		boardMemberRouter.PATCH("/:memberId", bmHdl.RemoveMember(appCtx))
+		boardMemberRouter.GET("", bmHdl.GetBoardMembers(appCtx))
 	}
 }

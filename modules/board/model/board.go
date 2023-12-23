@@ -15,7 +15,6 @@ type BoardInsert struct {
 	Name           string               `bson:"name"`
 	WorkspaceId    primitive.ObjectID   `bson:"workspaceId"`
 	AdminId        primitive.ObjectID   `bson:"adminId"`
-	MemberIds      []primitive.ObjectID `bson:"memberIds"`
 	ColumnOrderIds []primitive.ObjectID `bson:"columnOrderIds"`
 	//Labels         []Label   `bson:"labels"`
 }
@@ -27,7 +26,6 @@ type Board struct {
 	Name           string    `json:"name" bson:"name"`
 	WorkspaceId    string    `json:"workspaceId" bson:"workspaceId"`
 	AdminId        string    `json:"adminId" bson:"adminId"`
-	MemberIds      []string  `json:"memberIds" bson:"memberIds"`
 	ColumnOrderIds []string  `json:"columnOrderIds" bson:"columnOrderIds"`
 	//Labels         []Label   `json:"labels" bson:"labels"`
 }

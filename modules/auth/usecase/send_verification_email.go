@@ -17,7 +17,7 @@ func (uc *authUseCase) SendVerificationEmail(ctx context.Context, email string) 
 		return err
 	}
 
-	if user.IsVerified == true {
+	if *user.IsVerified == true {
 		return common.NewBadRequestErr(errors.New("email already verified"))
 	}
 
@@ -45,7 +45,7 @@ func (uc *authUseCase) sendVerificationEmail(ctx context.Context, user *usermode
 	// Send email verification
 	emailConfig := mailer.NewEmailConfigWithDynamicTemplate(
 		uc.fromEmail,
-		user.Email,
+		*user.Email,
 		"Verify Email",
 		uc.verifyEmailTemplateId,
 		map[string]interface{}{
