@@ -11,7 +11,15 @@ type CardRepository interface {
 }
 
 type CardChecklistRepository interface {
+	// Checklist
 	Create(ctx context.Context, cardId string, data *cardchecklistmodel.CardChecklist) error
+	Update(ctx context.Context, cardId, checklistId string, data *cardchecklistmodel.CardChecklistUpdate) error
+	Delete(ctx context.Context, cardId, checklistId string) error
+
+	// Checklist Item
+	CreateChecklistItem(ctx context.Context, cardId, checklistId string, data *cardchecklistmodel.ChecklistItem) error
+	UpdateChecklistItem(ctx context.Context, cardId, checklistId, itemId string, updateData *cardchecklistmodel.ChecklistItemUpdate) error
+	DeleteChecklistItem(ctx context.Context, cardId, checklistId, itemId string) error
 }
 
 type cardChecklistUseCase struct {
