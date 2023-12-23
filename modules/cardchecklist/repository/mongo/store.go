@@ -6,6 +6,8 @@ type cardChecklistRepository struct {
 	db *mongo.Database
 }
 
-func NewCardChecklistRepository(db *mongo.Database) *cardChecklistRepository {
+func NewCardChecklistRepository(
+	db *mongo.Database,
+) *cardChecklistRepository {
 	return &cardChecklistRepository{db: db}
 }

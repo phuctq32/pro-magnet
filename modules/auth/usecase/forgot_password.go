@@ -16,11 +16,11 @@ func (uc *authUseCase) ForgotPassword(ctx context.Context, email string) error {
 		return err
 	}
 
-	if user.Type != usermodel.InternalUser {
+	if *user.Type != usermodel.InternalUser {
 		return common.NewNotFoundErr("user", usermodel.ErrUserNotFound)
 	}
 
-	if !user.IsVerified {
+	if !*user.IsVerified {
 		return common.NewBadRequestErr(usermodel.ErrUserNotVerified)
 	}
 
@@ -39,7 +39,7 @@ func (uc *authUseCase) ForgotPassword(ctx context.Context, email string) error {
 	// Send reset password email
 	emailConfig := mailer.NewEmailConfigWithDynamicTemplate(
 		uc.fromEmail,
-		user.Email,
+		*user.Email,
 		"Reset password",
 		uc.resetPasswordEmailTemplateId,
 		map[string]interface{}{

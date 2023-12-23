@@ -7,7 +7,12 @@ import (
 	"pro-magnet/components/jwt"
 	"pro-magnet/components/mailer"
 	usermodel "pro-magnet/modules/user/model"
+	wsmodel "pro-magnet/modules/workspace/model"
 )
+
+type WorkspaceRepository interface {
+	Create(ctx context.Context, data *wsmodel.WorkspaceCreation) (*wsmodel.Workspace, error)
+}
 
 type UserRepository interface {
 	Create(ctx context.Context, data *usermodel.User) (*string, error)
@@ -29,6 +34,7 @@ type AuthRedisRepository interface {
 type authUseCase struct {
 	userRepo                     UserRepository
 	redisRepo                    AuthRedisRepository
+	wsRepo                       WorkspaceRepository
 	ggOauth                      ggoauth2.GoogleOAuth
 	hasher                       hasher.Hasher
 	mailer                       mailer.Mailer
@@ -47,6 +53,7 @@ type authUseCase struct {
 func NewAuthUseCase(
 	userRepo UserRepository,
 	authRedisRepo AuthRedisRepository,
+	wsRepo WorkspaceRepository,
 	ggOauth ggoauth2.GoogleOAuth,
 	hasher hasher.Hasher,
 	mailer mailer.Mailer,
@@ -64,6 +71,7 @@ func NewAuthUseCase(
 	return &authUseCase{
 		userRepo:                     userRepo,
 		redisRepo:                    authRedisRepo,
+		wsRepo:                       wsRepo,
 		ggOauth:                      ggOauth,
 		hasher:                       hasher,
 		mailer:                       mailer,

@@ -25,24 +25,26 @@ func (uc *authUseCase) LoginWithGoogle(
 		return nil, err
 	}
 	if user != nil {
-		if user.Type != usermodel.GoogleUser {
+		if *user.Type != usermodel.GoogleUser {
 			return nil, common.NewBadRequestErr(authmodel.ErrUserExisted)
 		}
 	} else {
 		// Create new Google user
 		now := time.Now()
+		isVerified := true
 		user = &usermodel.User{
-			CreatedAt:   now,
-			UpdatedAt:   now,
-			Email:       ggUser.Email,
+			CreatedAt:   &now,
+			UpdatedAt:   &now,
+			Email:       &ggUser.Email,
 			Name:        ggUser.Name,
 			Password:    nil,
-			IsVerified:  true,
+			IsVerified:  &isVerified,
 			Avatar:      ggUser.Avatar,
 			PhoneNumber: ggUser.Phonenumber,
 			Birthday:    ggUser.Birthday,
-			Type:        usermodel.GoogleUser,
 		}
+		userType := usermodel.GoogleUser
+		user.Type = &userType
 
 		userId, err := uc.userRepo.Create(ctx, user)
 		if err != nil {

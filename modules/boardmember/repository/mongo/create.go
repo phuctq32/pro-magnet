@@ -23,3 +23,21 @@ func (repo *boardMemberRepository) Create(
 
 	return nil
 }
+
+func (repo *boardMemberRepository) CreateMany(
+	ctx context.Context,
+	data *bmmodel.AddBoardMembers,
+) error {
+	insertData, err := data.ToBoardMembersInsert()
+	if err != nil {
+		return err
+	}
+
+	if _, err := repo.db.
+		Collection(bmmodel.BoardMemberCollectionName).
+		InsertMany(ctx, insertData); err != nil {
+		return common.NewServerErr(err)
+	}
+
+	return nil
+}
