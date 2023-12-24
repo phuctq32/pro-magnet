@@ -9,6 +9,7 @@ import (
 	cardmodel "pro-magnet/modules/card/model"
 )
 
+// Soft delete
 func (repo *cardRepository) Delete(
 	ctx context.Context,
 	filter map[string]interface{},
