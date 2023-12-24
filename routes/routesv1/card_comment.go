@@ -24,6 +24,6 @@ func NewCardCommentRouter(appCtx appcontext.AppContext, router *gin.RouterGroup)
 	{
 		cmRouter.POST("", cmHdl.CreateCardComment(appCtx))
 		cmRouter.PATCH("/:commentId", cmHdl.UpdateCardComment(appCtx))
-		cmRouter.DELETE("/:commentId")
+		cmRouter.DELETE("/:commentId", cmHdl.DeleteComment(appCtx))
 	}
 }

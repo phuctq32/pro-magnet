@@ -17,6 +17,7 @@ type CardRepository interface {
 type CardCommentRepository interface {
 	Create(ctx context.Context, cardId string, data *cardcommentmodel.CardCommentCreate) error
 	Update(ctx context.Context, cardId, commentId string, updateData *cardcommentmodel.CardCommentUpdate) error
+	Delete(ctx context.Context, cardId, commentId string) error
 }
 
 type cardCommentUseCase struct {
