@@ -18,9 +18,44 @@ func (repo *cardRepository) UpdateById(
 ) (*cardmodel.Card, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return nil, err
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
 	}
 	return repo.UpdateOne(ctx, map[string]interface{}{"_id": oid}, updateData)
+}
+
+func (repo *cardRepository) UpdateDate(
+	ctx context.Context,
+	id string,
+	updateData *cardmodel.CardDateUpdate,
+) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	_, err = updateCard(ctx, repo.db, map[string]interface{}{"_id": oid}, updateData)
+
+	return err
+}
+
+func (repo *cardRepository) RemoveDate(
+	ctx context.Context,
+	id string,
+) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	_, err = repo.db.Collection(cardmodel.CardCollectionName).
+		UpdateOne(
+			ctx,
+			bson.M{"_id": oid},
+			bson.M{"$unset": bson.M{
+				"startDate": 1,
+				"endDate":   1,
+			}},
+		)
+
+	return err
 }
 
 func (repo *cardRepository) UpdateOne(
@@ -31,7 +66,7 @@ func (repo *cardRepository) UpdateOne(
 	return updateCard(ctx, repo.db, filter, updateData)
 }
 
-func updateCard[T map[string]interface{} | *cardmodel.CardUpdate](
+func updateCard[T map[string]interface{} | *cardmodel.CardUpdate | *cardmodel.CardDateUpdate](
 	ctx context.Context,
 	db *mongo.Database,
 	filter map[string]interface{},

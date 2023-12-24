@@ -19,6 +19,8 @@ type CardRepository interface {
 	Create(ctx context.Context, data *cardmodel.CardCreation) (*cardmodel.Card, error)
 	FindById(ctx context.Context, id string) (*cardmodel.Card, error)
 	UpdateById(ctx context.Context, id string, updateData *cardmodel.CardUpdate) (*cardmodel.Card, error)
+	UpdateDate(ctx context.Context, id string, updateData *cardmodel.CardDateUpdate) error
+	RemoveDate(ctx context.Context, id string) error
 	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 

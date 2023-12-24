@@ -3,6 +3,7 @@ package cardmodel
 import (
 	camodel "pro-magnet/modules/cardattachment/model"
 	cardchecklistmodel "pro-magnet/modules/cardchecklist/model"
+	cardcommentmodel "pro-magnet/modules/cardcomment/model"
 	labelmodel "pro-magnet/modules/label/model"
 	"time"
 )
@@ -21,7 +22,7 @@ type Card struct {
 	Cover       *string                            `json:"cover" bson:"cover,omitempty"`
 	MemberIds   []string                           `json:"-" bson:"memberIds"`
 	Checklists  []cardchecklistmodel.CardChecklist `json:"checklists" bson:"checklists"`
-	Comments    []CardComment                      `json:"comments" bson:"comments"`
+	Comments    []cardcommentmodel.CardComment     `json:"comments" bson:"comments"`
 	StartDate   *time.Time                         `json:"startDate" bson:"startDate,omitempty"`
 	EndDate     *time.Time                         `json:"endDate" bson:"endDate,omitempty"`
 	IsDone      bool                               `json:"isDone" bson:"isDone"`

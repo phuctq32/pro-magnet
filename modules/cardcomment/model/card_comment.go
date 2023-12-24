@@ -1,6 +1,7 @@
-package cardmodel
+package cardcommentmodel
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	usermodel "pro-magnet/modules/user/model"
 	"time"
 )
@@ -14,4 +15,12 @@ type CardComment struct {
 
 	// Aggregated data
 	Author *usermodel.User `json:"author" bson:"-"`
+}
+
+type CardCommentInsert struct {
+	Id        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
+	UpdatedAt time.Time          `json:"updatedAt" bson:"updatedAt"`
+	Content   string             `json:"content" bson:"content"`
+	AuthorId  primitive.ObjectID `json:"-" bson:"authorId"`
 }
