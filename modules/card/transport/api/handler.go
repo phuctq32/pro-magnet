@@ -10,6 +10,7 @@ type CardUseCase interface {
 	GetCardById(ctx context.Context, id string) (*cardmodel.Card, error)
 	UpdateCardById(ctx context.Context, userId, cardId string, data *cardmodel.CardUpdate) (*cardmodel.Card, error)
 	UpdateCardDate(ctx context.Context, requesterId, cardId string, data *cardmodel.CardDateUpdate) error
+	RemoveCardDate(ctx context.Context, requesterId, cardId string) error
 }
 
 type cardHandler struct {

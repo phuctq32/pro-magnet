@@ -37,6 +37,27 @@ func (repo *cardRepository) UpdateDate(
 	return err
 }
 
+func (repo *cardRepository) RemoveDate(
+	ctx context.Context,
+	id string,
+) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	_, err = repo.db.Collection(cardmodel.CardCollectionName).
+		UpdateOne(
+			ctx,
+			bson.M{"_id": oid},
+			bson.M{"$unset": bson.M{
+				"startDate": 1,
+				"endDate":   1,
+			}},
+		)
+
+	return err
+}
+
 func (repo *cardRepository) UpdateOne(
 	ctx context.Context,
 	filter map[string]interface{},
