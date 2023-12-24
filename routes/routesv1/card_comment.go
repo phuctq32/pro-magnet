@@ -23,7 +23,7 @@ func NewCardCommentRouter(appCtx appcontext.AppContext, router *gin.RouterGroup)
 	cmRouter := router.Group("/cards/:cardId/comments", middlewares.Authorize(appCtx))
 	{
 		cmRouter.POST("", cmHdl.CreateCardComment(appCtx))
-		cmRouter.PATCH("/:commentId")
+		cmRouter.PATCH("/:commentId", cmHdl.UpdateCardComment(appCtx))
 		cmRouter.DELETE("/:commentId")
 	}
 }

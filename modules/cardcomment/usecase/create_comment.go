@@ -13,8 +13,7 @@ func (uc *cardCommentUseCase) CreateCardComment(
 	cardId string,
 	data *cardcommentmodel.CardCommentCreate,
 ) error {
-
-	if err := uc.validate(ctx, cardId, data.UserId); err != nil {
+	if _, err := uc.validate(ctx, cardId, data.UserId); err != nil {
 		return err
 	}
 
@@ -24,23 +23,23 @@ func (uc *cardCommentUseCase) CreateCardComment(
 func (uc *cardCommentUseCase) validate(
 	ctx context.Context,
 	cardId, userId string,
-) error {
+) (*cardmodel.Card, error) {
 	card, err := uc.cardRepo.FindById(ctx, cardId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if card.Status == cardmodel.Deleted {
-		return common.NewBadRequestErr(cardmodel.ErrCardDeleted)
+		return nil, common.NewBadRequestErr(cardmodel.ErrCardDeleted)
 	}
 
 	// Check user is a member of card's board
 	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, card.BoardId, userId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if !isBoardMember {
-		return common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
+		return nil, common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
 	}
 
-	return nil
+	return card, nil
 }

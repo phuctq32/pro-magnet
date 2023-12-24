@@ -7,6 +7,7 @@ import (
 
 type CardCommentUseCase interface {
 	CreateCardComment(ctx context.Context, cardId string, data *cardcommentmodel.CardCommentCreate) error
+	UpdateCardComment(ctx context.Context, requesterId, cardId, commentId string, updateData *cardcommentmodel.CardCommentUpdate) error
 }
 
 type cardCommentHandler struct {
