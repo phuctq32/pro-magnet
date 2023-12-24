@@ -3,6 +3,7 @@ package cardmodel
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	cardchecklistmodel "pro-magnet/modules/cardchecklist/model"
+	"pro-magnet/modules/cardcomment/model"
 	"time"
 )
 
@@ -24,7 +25,7 @@ type CardInsert struct {
 	Cover       *string                            `bson:"cover,omitempty"`
 	MemberIds   []primitive.ObjectID               `bson:"memberIds"`
 	Checklists  []cardchecklistmodel.CardChecklist `bson:"checklists"`
-	Comments    []CardComment                      `bson:"comments"`
+	Comments    []cardcommentmodel.CardComment     `bson:"comments"`
 	StartDate   *time.Time                         `bson:"startDate,omitempty"`
 	EndDate     *time.Time                         `bson:"endDate,omitempty"`
 	IsDone      bool                               `bson:"isDone"`
@@ -54,7 +55,7 @@ func (cc *CardCreation) ToCardInsert() (*CardInsert, error) {
 		Cover:       nil,
 		MemberIds:   []primitive.ObjectID{},
 		Checklists:  []cardchecklistmodel.CardChecklist{},
-		Comments:    []CardComment{},
+		Comments:    []cardcommentmodel.CardComment{},
 		StartDate:   nil,
 		EndDate:     nil,
 		IsDone:      false,

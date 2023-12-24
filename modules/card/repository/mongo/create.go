@@ -5,6 +5,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	cardmodel "pro-magnet/modules/card/model"
 	cardchecklistmodel "pro-magnet/modules/cardchecklist/model"
+	"pro-magnet/modules/cardcomment/model"
 )
 
 func (repo *cardRepository) Create(
@@ -33,7 +34,7 @@ func (repo *cardRepository) Create(
 		Cover:      nil,
 		MemberIds:  []string{},
 		Checklists: []cardchecklistmodel.CardChecklist{},
-		Comments:   []cardmodel.CardComment{},
+		Comments:   []cardcommentmodel.CardComment{},
 		StartDate:  nil,
 		EndDate:    nil,
 		IsDone:     false,
