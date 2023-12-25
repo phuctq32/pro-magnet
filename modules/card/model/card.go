@@ -5,6 +5,7 @@ import (
 	cardchecklistmodel "pro-magnet/modules/cardchecklist/model"
 	cardcommentmodel "pro-magnet/modules/cardcomment/model"
 	labelmodel "pro-magnet/modules/label/model"
+	usermodel "pro-magnet/modules/user/model"
 	"time"
 )
 
@@ -28,6 +29,7 @@ type Card struct {
 	IsDone      bool                               `json:"isDone" bson:"isDone"`
 
 	// Aggregated data
+	Members     []usermodel.User         `json:"members"`
 	Labels      []labelmodel.Label       `json:"labels"`
 	Attachments []camodel.CardAttachment `json:"attachments"`
 }

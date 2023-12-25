@@ -24,7 +24,7 @@ func (uc *boardMemberUseCase) GetBoardMembers(
 		return nil, common.NewBadRequestErr(bmmodel.ErrUserNotBoardMember)
 	}
 
-	memberIds, err := uc.bmRepo.FindMemberIdByBoardId(ctx, boardId)
+	memberIds, err := uc.bmRepo.FindMemberIdsByBoardId(ctx, boardId)
 
 	return uc.userRepo.FindSimpleUsersByIds(ctx, memberIds)
 }

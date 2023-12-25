@@ -2,7 +2,6 @@ package validator
 
 import (
 	validator2 "github.com/go-playground/validator/v10"
-	"github.com/rs/zerolog/log"
 	"reflect"
 	"strings"
 )
@@ -36,7 +35,6 @@ func NewValidator() Validator {
 func (v *validator) Validate(in interface{}) []ValidationError {
 	if errs := v.validator.Struct(in); errs != nil {
 		var res []ValidationError
-		log.Info().Interface("err", errs).Msg("")
 		for _, err := range errs.(validator2.ValidationErrors) {
 			res = append(res, *convert(err))
 		}
