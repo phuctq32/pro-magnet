@@ -15,6 +15,7 @@ type CardAttachmentRepo interface {
 
 type UserRepo interface {
 	FindSimpleUserById(ctx context.Context, userId string) (*usermodel.User, error)
+	FindSimpleUsersByIds(ctx context.Context, userIds []string) ([]usermodel.User, error)
 }
 
 type cardDataAggregator struct {
@@ -44,6 +45,7 @@ func (agg *cardDataAggregator) Aggregate(
 		agg.aggregateLabels(card),
 		agg.aggregateAttachments(card),
 		agg.aggregateCommentsAuthor(card),
+		agg.aggregateCardMembers(card),
 	); err != nil {
 		return err
 	}
@@ -73,6 +75,20 @@ func (agg *cardDataAggregator) aggregateCommentsAuthor(
 			card.Comments[i].Author = author
 		}
 
+		return nil
+	}
+}
+
+func (agg *cardDataAggregator) aggregateCardMembers(
+	card *cardmodel.Card,
+) func(context.Context) error {
+	return func(ctx context.Context) error {
+		members, err := agg.userRepo.FindSimpleUsersByIds(ctx, card.MemberIds)
+		if err != nil {
+			return err
+		}
+
+		card.Members = members
 		return nil
 	}
 }
