@@ -20,7 +20,7 @@ type BoardMemberRepository interface {
 	IsBoardMember(ctx context.Context, boardId, userId string) (bool, error)
 	CreateMany(ctx context.Context, data *bmmodel.AddBoardMembers) error
 	Delete(ctx context.Context, data *bmmodel.BoardMember) error
-	FindMemberIdByBoardId(ctx context.Context, boardId string) ([]string, error)
+	FindMemberIdsByBoardId(ctx context.Context, boardId string) ([]string, error)
 }
 
 type boardMemberUseCase struct {

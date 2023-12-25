@@ -28,7 +28,12 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		cardRouter.GET("/:cardId", cardHdl.GetCardById(appCtx))
 		cardRouter.POST("", cardHdl.CreateCard(appCtx))
 		cardRouter.PATCH("/:cardId", cardHdl.UpdateCardById(appCtx))
+
 		cardRouter.PATCH("/:cardId/date", cardHdl.UpdateCardDate(appCtx))
 		cardRouter.DELETE("/:cardId/date", cardHdl.RemoveCardDate(appCtx))
+
+		cardRouter.GET("/:cardId/members-to-add")
+		cardRouter.POST("/:cardId/members")
+		cardRouter.DELETE("/:cardId/members/:memberId")
 	}
 }

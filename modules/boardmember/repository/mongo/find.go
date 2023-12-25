@@ -9,7 +9,7 @@ import (
 	bmmodel "pro-magnet/modules/boardmember/model"
 )
 
-func (repo *boardMemberRepository) FindMemberIdByBoardId(
+func (repo *boardMemberRepository) FindMemberIdsByBoardId(
 	ctx context.Context,
 	boardId string,
 ) ([]string, error) {
