@@ -82,7 +82,7 @@ func (repo *cardRepository) UpdateMembers(
 	return err
 }
 
-func (repo *cardRepository) RemoveMembers(
+func (repo *cardRepository) RemoveMember(
 	ctx context.Context,
 	cardId, memberId string,
 ) error {
