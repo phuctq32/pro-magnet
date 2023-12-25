@@ -58,6 +58,54 @@ func (repo *cardRepository) RemoveDate(
 	return err
 }
 
+func (repo *cardRepository) UpdateMembers(
+	ctx context.Context,
+	cardId, memberId string,
+) error {
+	cardOid, err := primitive.ObjectIDFromHex(cardId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	memberOid, err := primitive.ObjectIDFromHex(memberId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	_, err = repo.db.Collection(cardmodel.CardCollectionName).
+		UpdateOne(
+			ctx,
+			bson.M{"_id": cardOid},
+			bson.M{"$push": bson.M{"memberIds": memberOid}},
+		)
+
+	return err
+}
+
+func (repo *cardRepository) RemoveMembers(
+	ctx context.Context,
+	cardId, memberId string,
+) error {
+	cardOid, err := primitive.ObjectIDFromHex(cardId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	memberOid, err := primitive.ObjectIDFromHex(memberId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	_, err = repo.db.Collection(cardmodel.CardCollectionName).
+		UpdateOne(
+			ctx,
+			bson.M{"_id": cardOid},
+			bson.M{"$pull": bson.M{"memberIds": memberOid}},
+		)
+
+	return err
+}
+
 func (repo *cardRepository) UpdateOne(
 	ctx context.Context,
 	filter map[string]interface{},
