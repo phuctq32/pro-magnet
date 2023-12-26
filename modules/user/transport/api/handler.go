@@ -11,6 +11,7 @@ type UserUseCase interface {
 	UpdateUser(ctx context.Context, userId string, data *usermodel.UserUpdate) (*usermodel.User, error)
 
 	GetUsersToAddToCard(ctx context.Context, requesterId, cardId string) ([]usermodel.User, error)
+	GetUsersToAddToWorkspace(ctx context.Context, requesterId, workspaceId, emailSearchQuery string) ([]usermodel.User, error)
 }
 
 type userHandler struct {
