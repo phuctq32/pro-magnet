@@ -7,6 +7,7 @@ import (
 
 type WorkspaceMemberUseCase interface {
 	AddMembers(ctx context.Context, requesterId string, data *wsmembermodel.WorkspaceMembersCreate) error
+	RemoveMember(ctx context.Context, requesterId, workspaceId, memberId string) error
 }
 
 type wsMemberHandler struct {

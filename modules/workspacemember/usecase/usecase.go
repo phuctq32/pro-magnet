@@ -13,6 +13,7 @@ type WorkspaceRepository interface {
 type WorkspaceMemberRepository interface {
 	IsWorkspaceMember(ctx context.Context, workspaceId, userId string) (bool, error)
 	CreateMany(ctx context.Context, data *wsmembermodel.WorkspaceMembersCreate) error
+	Delete(ctx context.Context, workspaceId, userId string) error
 }
 
 type wsMemberUseCase struct {

@@ -28,5 +28,6 @@ func NewWorkspaceRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	wsMemberRouter := wsRouter.Group("/:workspaceId/members")
 	{
 		wsMemberRouter.POST("", wsMemberHdl.AddWorkspaceMembers(appCtx))
+		wsMemberRouter.DELETE("/:memberId", wsMemberHdl.RemoveMemberFromWorkspace(appCtx))
 	}
 }
