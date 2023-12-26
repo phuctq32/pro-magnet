@@ -11,7 +11,7 @@ type CardUseCase interface {
 	UpdateCardById(ctx context.Context, userId, cardId string, data *cardmodel.CardUpdate) (*cardmodel.Card, error)
 	UpdateCardDate(ctx context.Context, requesterId, cardId string, data *cardmodel.CardDateUpdate) error
 	RemoveCardDate(ctx context.Context, requesterId, cardId string) error
-	AddMemberToCard(ctx context.Context, requesterId, cardId, memberId string) error
+	AddMemberToCard(ctx context.Context, requesterId, cardId string, memberIds []string) error
 	RemoveMemberFromCard(ctx context.Context, requesterId, cardId, memberId string) error
 }
 

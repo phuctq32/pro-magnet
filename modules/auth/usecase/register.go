@@ -50,7 +50,6 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 			Name:        newUser.Name + "'s Workspace",
 			OwnerUserId: newUser.UserId(),
 			Image:       wsmodel.DefaultImageUrl,
-			MemberIds:   []string{},
 		}
 		if _, e = uc.wsRepo.Create(ctx, defaultWorkspace); e != nil {
 			return e

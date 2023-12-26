@@ -20,7 +20,6 @@ func (uc *workspaceUseCase) CreateWorkspace(
 	}
 
 	data.OwnerUserId = userId
-	data.MemberIds = append(data.MemberIds, userId)
 	data.Image = wrkspmodel.DefaultImageUrl
 
 	return uc.wsRepo.Create(ctx, data)

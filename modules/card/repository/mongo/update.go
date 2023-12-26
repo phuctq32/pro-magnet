@@ -60,23 +60,27 @@ func (repo *cardRepository) RemoveDate(
 
 func (repo *cardRepository) UpdateMembers(
 	ctx context.Context,
-	cardId, memberId string,
+	cardId string, memberIds []string,
 ) error {
 	cardOid, err := primitive.ObjectIDFromHex(cardId)
 	if err != nil {
 		return common.NewBadRequestErr(errors.New("invalid objectId"))
 	}
 
-	memberOid, err := primitive.ObjectIDFromHex(memberId)
-	if err != nil {
-		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	memberOids := make([]primitive.ObjectID, 0)
+	for _, memberId := range memberIds {
+		memberOid, err := primitive.ObjectIDFromHex(memberId)
+		if err != nil {
+			return common.NewBadRequestErr(errors.New("invalid objectId"))
+		}
+		memberOids = append(memberOids, memberOid)
 	}
 
 	_, err = repo.db.Collection(cardmodel.CardCollectionName).
 		UpdateOne(
 			ctx,
 			bson.M{"_id": cardOid},
-			bson.M{"$push": bson.M{"memberIds": memberOid}},
+			bson.M{"$push": bson.M{"memberIds": bson.M{"$each": memberOids}}},
 		)
 
 	return err
