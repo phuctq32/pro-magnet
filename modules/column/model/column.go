@@ -12,5 +12,5 @@ type Column struct {
 	OrderedCardIds []string     `json:"orderedCardIds" bson:"orderedCardIds"`
 
 	// Aggregated data
-	Cards []cardmodel.Card `json:"cards,omitempty"`
+	Cards []cardmodel.Card `json:"cards"`
 }

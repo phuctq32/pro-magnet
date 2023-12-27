@@ -14,6 +14,7 @@ type BoardMemberRepository interface {
 type ColumnRepository interface {
 	FindById(ctx context.Context, id string) (*columnmodel.Column, error)
 	UpdateById(ctx context.Context, id string, updateData *columnmodel.ColumnUpdate) (*columnmodel.Column, error)
+	RemoveCardId(ctx context.Context, columnId, cardId string) error
 }
 
 type LabelRepository interface {
@@ -25,6 +26,7 @@ type CardRepository interface {
 	Create(ctx context.Context, data *cardmodel.CardCreation) (*cardmodel.Card, error)
 	FindById(ctx context.Context, id string) (*cardmodel.Card, error)
 	UpdateById(ctx context.Context, id string, updateData *cardmodel.CardUpdate) (*cardmodel.Card, error)
+	DeleteById(ctx context.Context, id string) error
 	UpdateDate(ctx context.Context, id string, updateData *cardmodel.CardDateUpdate) error
 	RemoveDate(ctx context.Context, id string) error
 	UpdateMembers(ctx context.Context, cardId string, memberId []string) error

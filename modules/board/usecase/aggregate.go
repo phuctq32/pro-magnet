@@ -58,7 +58,7 @@ func NewBoardAggregator(
 func (ba *boardAggregator) Aggregate(ctx context.Context, board *boardmodel.Board) error {
 	return ba.asyncg.ProcessWithTimeout(
 		ctx,
-		time.Second*1000,
+		time.Second*10,
 		ba.aggregateLabels(board),
 		ba.aggregateColumns(board),
 	)
@@ -122,12 +122,6 @@ func (ba *boardAggregator) aggregateCards(col *columnmodel.Column) func(context.
 
 func (ba *boardAggregator) aggregateCard(card *cardmodel.Card) func(context.Context) error {
 	return func(ctx context.Context) error {
-		//memberCount := len(card.MemberIds)
-		//card.MemberCount = &memberCount
-		//
-		//commentCount := len(card.Comments)
-		//card.CommentCount = &commentCount
-
 		attachmentCount, err := ba.caRepo.CountByCardId(ctx, camodel.Active, *card.Id)
 		if err != nil {
 			return nil

@@ -22,10 +22,7 @@ func (repo *columnRepository) Update(
 	if err := repo.db.
 		Collection(columnmodel.ColumnCollectionName).
 		FindOneAndUpdate(ctx, filter, bson.M{
-			"$set": updateData,
-			"$currentDate": bson.M{
-				"updatedAt": bson.M{"$type": "date"},
-			},
+			"$set": updateData.ToUpdateData(),
 		}, opts).Decode(&updatedCol); err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, common.NewNotFoundErr("column", err)
@@ -47,4 +44,34 @@ func (repo *columnRepository) UpdateById(
 	}
 
 	return repo.Update(ctx, map[string]interface{}{"_id": oid}, updateData)
+}
+
+func (repo *columnRepository) RemoveCardId(
+	ctx context.Context,
+	columnId, cardId string,
+) error {
+	columnOid, err := primitive.ObjectIDFromHex(columnId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	cardOid, err := primitive.ObjectIDFromHex(cardId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	result, err := repo.db.
+		Collection(columnmodel.ColumnCollectionName).
+		UpdateOne(ctx, bson.M{"_id": columnOid},
+			bson.M{
+				"$pull": bson.M{"orderedCardIds": cardOid},
+			},
+		)
+	if err != nil {
+		return common.NewServerErr(err)
+	}
+	if result.MatchedCount == 0 {
+		return common.NewNotFoundErr("column", mongo.ErrNoDocuments)
+	}
+
+	return nil
 }

@@ -17,7 +17,7 @@ func (repo *boardRepository) Update(
 ) error {
 	result, err := repo.db.
 		Collection(boardmodel.BoardCollectionName).
-		UpdateOne(ctx, filter, bson.M{"$set": updateData})
+		UpdateOne(ctx, filter, bson.M{"$set": updateData.ToUpdateData()})
 	if err != nil {
 		return common.NewServerErr(err)
 	}
