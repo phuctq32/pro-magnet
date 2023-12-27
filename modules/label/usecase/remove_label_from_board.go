@@ -7,10 +7,9 @@ import (
 	labelmodel "pro-magnet/modules/label/model"
 )
 
-func (uc *labelUseCase) UpdateLabel(
+func (uc *labelUseCase) RemoveLabelFromBoard(
 	ctx context.Context,
 	requesterId, labelId string,
-	updateData *labelmodel.LabelUpdate,
 ) error {
 	return uc.labelRepo.WithTransaction(ctx, func(txCtx context.Context) error {
 		label, err := uc.labelRepo.FindById(txCtx, labelId)
@@ -29,16 +28,16 @@ func (uc *labelUseCase) UpdateLabel(
 			return common.NewBadRequestErr(bmmodel.ErrUserNotBoardMember)
 		}
 
-		if err = uc.validateLabel(
-			txCtx, label.Id,
-			label.BoardId,
-			*updateData.Title,
-			*updateData.Color,
-		); err != nil {
+		cardIds, err := uc.cardRepo.FindCardIdsByLabelId(ctx, *label.Id)
+		if err != nil {
 			return err
 		}
 
-		if err = uc.labelRepo.UpdateById(txCtx, labelId, updateData); err != nil {
+		if err = uc.cardRepo.RemoveLabelFromCardsByIds(ctx, cardIds, labelId); err != nil {
+			return err
+		}
+
+		if err = uc.labelRepo.DeleteById(ctx, labelId); err != nil {
 			return err
 		}
 

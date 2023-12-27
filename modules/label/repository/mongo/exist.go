@@ -32,6 +32,7 @@ func (repo *labelRepository) ExistsInBoard(
 		return false, common.NewBadRequestErr(err)
 	}
 	filter := map[string]interface{}{
+		"status":  labelmodel.Active,
 		"boardId": boardOid,
 		"title":   title,
 		"color":   color,

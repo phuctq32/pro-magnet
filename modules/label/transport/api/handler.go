@@ -8,6 +8,8 @@ import (
 type LabelUseCase interface {
 	CreateLabel(ctx context.Context, data *labelmodel.LabelCreation) (*labelmodel.Label, error)
 	UpdateLabel(ctx context.Context, requesterId, labelId string, updateData *labelmodel.LabelUpdate) error
+	RemoveLabelFromBoard(ctx context.Context, requesterId, labelId string) error
+	RemoveLabelFromCard(ctx context.Context, requesterId, cardId, labelId string) error
 }
 
 type labelHandler struct {

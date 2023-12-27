@@ -3,8 +3,10 @@ package mongo
 import (
 	"context"
 	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"pro-magnet/common"
 	cardmodel "pro-magnet/modules/card/model"
 )
@@ -38,4 +40,40 @@ func (repo *cardRepository) FindById(
 	}
 
 	return repo.FindOne(ctx, map[string]interface{}{"_id": oid})
+}
+
+func (repo *cardRepository) FindCardIdsByLabelId(
+	ctx context.Context,
+	labelId string,
+) ([]string, error) {
+	labelOid, err := primitive.ObjectIDFromHex(labelId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(err)
+	}
+
+	opt := options.Find().SetProjection(bson.M{
+		"_id": 1,
+	})
+	cursor, err := repo.db.
+		Collection(cardmodel.CardCollectionName).
+		Find(ctx, bson.M{"labelIds": labelOid}, opt)
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	var cards []cardmodel.Card
+	if err = cursor.All(ctx, &cards); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	if cards == nil {
+		return []string{}, nil
+	}
+
+	res := make([]string, 0)
+	for i := 0; i < len(cards); i++ {
+		res = append(res, *cards[i].Id)
+	}
+
+	return res, nil
 }

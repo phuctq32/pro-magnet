@@ -24,6 +24,6 @@ func NewLabelRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	{
 		labelRouter.POST("", labelHdl.CreateLabel(appCtx))
 		labelRouter.PATCH("/:labelId", labelHdl.UpdateLabel(appCtx))
-		labelRouter.DELETE("/:labelId")
+		labelRouter.DELETE("/:labelId", labelHdl.RemoveLabel(appCtx))
 	}
 }

@@ -4,13 +4,13 @@ import (
 	"golang.org/x/net/context"
 	"pro-magnet/common"
 	bmmodel "pro-magnet/modules/boardmember/model"
+	cardmodel "pro-magnet/modules/card/model"
 	labelmodel "pro-magnet/modules/label/model"
 )
 
-func (uc *labelUseCase) UpdateLabel(
+func (uc *labelUseCase) RemoveLabelFromCard(
 	ctx context.Context,
-	requesterId, labelId string,
-	updateData *labelmodel.LabelUpdate,
+	requesterId, cardId, labelId string,
 ) error {
 	return uc.labelRepo.WithTransaction(ctx, func(txCtx context.Context) error {
 		label, err := uc.labelRepo.FindById(txCtx, labelId)
@@ -29,16 +29,26 @@ func (uc *labelUseCase) UpdateLabel(
 			return common.NewBadRequestErr(bmmodel.ErrUserNotBoardMember)
 		}
 
-		if err = uc.validateLabel(
-			txCtx, label.Id,
-			label.BoardId,
-			*updateData.Title,
-			*updateData.Color,
-		); err != nil {
+		card, err := uc.cardRepo.FindById(ctx, cardId)
+		if err != nil {
 			return err
 		}
+		if card.Status == cardmodel.Deleted {
+			return common.NewBadRequestErr(cardmodel.ErrCardDeleted)
+		}
 
-		if err = uc.labelRepo.UpdateById(txCtx, labelId, updateData); err != nil {
+		isLabelExistInCard := false
+		for _, id := range card.LabelIds {
+			if labelId == id {
+				isLabelExistInCard = true
+				break
+			}
+		}
+		if !isLabelExistInCard {
+			return common.NewBadRequestErr(labelmodel.ErrLabelNotExistInCard)
+		}
+
+		if err = uc.cardRepo.RemoveLabel(ctx, cardId, labelId); err != nil {
 			return err
 		}
 

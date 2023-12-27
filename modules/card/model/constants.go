@@ -6,5 +6,5 @@ const (
 
 const (
 	Active  CardStatus = 1
-	Deleted            = 0
+	Deleted CardStatus = 0
 )
