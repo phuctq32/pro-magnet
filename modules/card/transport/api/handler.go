@@ -13,6 +13,7 @@ type CardUseCase interface {
 	RemoveCardDate(ctx context.Context, requesterId, cardId string) error
 	AddMemberToCard(ctx context.Context, requesterId, cardId string, memberIds []string) error
 	RemoveMemberFromCard(ctx context.Context, requesterId, cardId, memberId string) error
+	AddLabelToCard(ctx context.Context, requesterId, cardId, labelId string) error
 }
 
 type cardHandler struct {

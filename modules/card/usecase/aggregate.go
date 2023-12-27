@@ -18,21 +18,28 @@ type UserRepo interface {
 	FindSimpleUsersByIds(ctx context.Context, userIds []string) ([]usermodel.User, error)
 }
 
+type LabelRepo interface {
+	FindByIds(ctx context.Context, status labelmodel.LabelStatus, labelIds []string) ([]labelmodel.Label, error)
+}
+
 type cardDataAggregator struct {
-	asyng    asyncgroup.AsyncGroup
-	caRepo   CardAttachmentRepo
-	userRepo UserRepo
+	asyng     asyncgroup.AsyncGroup
+	caRepo    CardAttachmentRepo
+	userRepo  UserRepo
+	labelRepo LabelRepo
 }
 
 func NewCardDataAggregator(
 	asyng asyncgroup.AsyncGroup,
 	caRepo CardAttachmentRepo,
 	userRepo UserRepo,
+	labelRepo LabelRepo,
 ) *cardDataAggregator {
 	return &cardDataAggregator{
-		asyng:    asyng,
-		caRepo:   caRepo,
-		userRepo: userRepo,
+		asyng:     asyng,
+		caRepo:    caRepo,
+		userRepo:  userRepo,
+		labelRepo: labelRepo,
 	}
 }
 
@@ -57,7 +64,12 @@ func (agg *cardDataAggregator) aggregateLabels(
 	card *cardmodel.Card,
 ) func(context.Context) error {
 	return func(ctx context.Context) error {
-		card.Labels = []labelmodel.Label{}
+		labels, err := agg.labelRepo.FindByIds(ctx, labelmodel.Active, card.LabelIds)
+		if err != nil {
+			return err
+		}
+
+		card.Labels = labels
 		return nil
 	}
 }
