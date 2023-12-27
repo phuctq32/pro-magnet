@@ -7,6 +7,7 @@ import (
 
 type LabelUseCase interface {
 	CreateLabel(ctx context.Context, data *labelmodel.LabelCreation) (*labelmodel.Label, error)
+	UpdateLabel(ctx context.Context, requesterId, labelId string, updateData *labelmodel.LabelUpdate) error
 }
 
 type labelHandler struct {

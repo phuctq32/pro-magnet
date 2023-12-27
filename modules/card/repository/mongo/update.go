@@ -110,6 +110,30 @@ func (repo *cardRepository) RemoveMember(
 	return err
 }
 
+func (repo *cardRepository) UpdateLabel(
+	ctx context.Context,
+	cardId string, labelId string,
+) error {
+	cardOid, err := primitive.ObjectIDFromHex(cardId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	labelOid, err := primitive.ObjectIDFromHex(labelId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	_, err = repo.db.Collection(cardmodel.CardCollectionName).
+		UpdateOne(
+			ctx,
+			bson.M{"_id": cardOid},
+			bson.M{"$push": bson.M{"labelIds": labelOid}},
+		)
+
+	return err
+}
+
 func (repo *cardRepository) UpdateOne(
 	ctx context.Context,
 	filter map[string]interface{},
