@@ -22,7 +22,7 @@ func (uc *cardUseCase) AddMemberToCard(
 	}
 
 	// Check requester and user are members of card's board
-	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, card.BoardId, requesterId)
+	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, *card.BoardId, requesterId)
 	if err != nil {
 		return err
 	}
@@ -31,7 +31,7 @@ func (uc *cardUseCase) AddMemberToCard(
 	}
 
 	for _, id := range memberIds {
-		isBoardMember, err = uc.bmRepo.IsBoardMember(ctx, card.BoardId, id)
+		isBoardMember, err = uc.bmRepo.IsBoardMember(ctx, *card.BoardId, id)
 		if err != nil {
 			return err
 		}

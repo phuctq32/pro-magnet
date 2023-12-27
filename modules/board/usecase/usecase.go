@@ -24,10 +24,15 @@ type BoardMemberRepository interface {
 	IsBoardMember(ctx context.Context, boardId, userId string) (bool, error)
 }
 
+type BoardAggregator interface {
+	Aggregate(ctx context.Context, board *boardmodel.Board) error
+}
+
 type boardUseCase struct {
 	boardRepo    BoardRepository
 	bmRepo       BoardMemberRepository
 	wsMemberRepo WorkspaceMemberRepository
+	boardAgg     BoardAggregator
 	asyncg       asyncgroup.AsyncGroup
 }
 
@@ -35,12 +40,14 @@ func NewBoardUseCase(
 	boardRepo BoardRepository,
 	bmRepo BoardMemberRepository,
 	wsMemberRepo WorkspaceMemberRepository,
+	boardAgg BoardAggregator,
 	asyncg asyncgroup.AsyncGroup,
 ) *boardUseCase {
 	return &boardUseCase{
 		boardRepo:    boardRepo,
 		bmRepo:       bmRepo,
 		wsMemberRepo: wsMemberRepo,
+		boardAgg:     boardAgg,
 		asyncg:       asyncg,
 	}
 }

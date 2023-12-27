@@ -1,5 +1,7 @@
 package columnmodel
 
+import cardmodel "pro-magnet/modules/card/model"
+
 type ColumnStatus uint8
 
 type Column struct {
@@ -8,4 +10,7 @@ type Column struct {
 	Title          string       `json:"title" bson:"title"`
 	BoardId        string       `json:"boardId" bson:"boardId"`
 	OrderedCardIds []string     `json:"orderedCardIds" bson:"orderedCardIds"`
+
+	// Aggregated data
+	Cards []cardmodel.Card `json:"cards,omitempty"`
 }

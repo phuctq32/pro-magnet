@@ -2,6 +2,7 @@ package carepo
 
 import (
 	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/net/context"
@@ -38,4 +39,27 @@ func (repo *cardAttachmentRepository) FindById(
 	}
 
 	return repo.FindOne(ctx, map[string]interface{}{"_id": oid})
+}
+
+func (repo *cardAttachmentRepository) CountByCardId(
+	ctx context.Context,
+	caStatus camodel.CardAttachmentStatus,
+	cardId string,
+) (int, error) {
+	cardOid, err := primitive.ObjectIDFromHex(cardId)
+	if err != nil {
+		return 0, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	count, err := repo.db.
+		Collection(camodel.CardAttachmentCollectionName).
+		CountDocuments(ctx, bson.M{
+			"cardId": cardOid,
+			"status": caStatus,
+		})
+	if err != nil {
+		return 0, common.NewServerErr(err)
+	}
+
+	return int(count), nil
 }

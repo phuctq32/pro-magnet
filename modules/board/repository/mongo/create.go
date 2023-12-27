@@ -17,12 +17,12 @@ func (repo *boardRepository) Create(
 	now := time.Now()
 
 	boardInsert := &boardmodel.BoardInsert{
-		CreatedAt:      now,
-		UpdatedAt:      now,
-		Name:           data.Name,
-		WorkspaceId:    wsOid,
-		AdminId:        adminOid,
-		ColumnOrderIds: []primitive.ObjectID{},
+		CreatedAt:        now,
+		UpdatedAt:        now,
+		Name:             data.Name,
+		WorkspaceId:      wsOid,
+		AdminId:          adminOid,
+		OrderedColumnIds: []primitive.ObjectID{},
 	}
 
 	result, err := repo.db.
@@ -35,12 +35,12 @@ func (repo *boardRepository) Create(
 	insertedId := result.InsertedID.(primitive.ObjectID).Hex()
 
 	return &boardmodel.Board{
-		Id:             &insertedId,
-		CreatedAt:      boardInsert.CreatedAt,
-		UpdatedAt:      boardInsert.UpdatedAt,
-		Name:           boardInsert.Name,
-		WorkspaceId:    data.WorkspaceId,
-		AdminId:        data.UserId,
-		ColumnOrderIds: []string{},
+		Id:               &insertedId,
+		CreatedAt:        boardInsert.CreatedAt,
+		UpdatedAt:        boardInsert.UpdatedAt,
+		Name:             boardInsert.Name,
+		WorkspaceId:      data.WorkspaceId,
+		AdminId:          data.UserId,
+		OrderedColumnIds: []string{},
 	}, nil
 }

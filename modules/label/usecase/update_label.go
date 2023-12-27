@@ -18,7 +18,7 @@ func (uc *labelUseCase) UpdateLabel(
 			return err
 		}
 		if label.Status == labelmodel.Deleted {
-			return common.NewBadRequestErr(labelmodel.ErrLabelDeleted)
+			return common.NewNotFoundErr("label", labelmodel.ErrLabelDeleted)
 		}
 
 		isBoardMember, err := uc.bmRepo.IsBoardMember(txCtx, label.BoardId, requesterId)
