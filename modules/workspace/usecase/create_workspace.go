@@ -4,6 +4,7 @@ import (
 	"context"
 	"pro-magnet/common"
 	wrkspmodel "pro-magnet/modules/workspace/model"
+	wsmembermodel "pro-magnet/modules/workspacemember/model"
 )
 
 func (uc *workspaceUseCase) CreateWorkspace(
@@ -20,8 +21,30 @@ func (uc *workspaceUseCase) CreateWorkspace(
 	}
 
 	data.OwnerUserId = userId
-	data.MemberIds = append(data.MemberIds, userId)
 	data.Image = wrkspmodel.DefaultImageUrl
 
-	return uc.wsRepo.Create(ctx, data)
+	var newWs *wrkspmodel.Workspace
+	err = uc.wsRepo.WithTransaction(ctx, func(txCtx context.Context) error {
+		var e error
+		newWs, e = uc.wsRepo.Create(ctx, data)
+		if e != nil {
+			return e
+		}
+
+		// Add user to workspace member
+		wsMember := &wsmembermodel.WorkspaceMembersCreate{
+			WorkspaceId: *newWs.Id,
+			UserIds:     []string{data.OwnerUserId},
+		}
+		if e = uc.wsMemberRepo.CreateMany(ctx, wsMember); e != nil {
+			return e
+		}
+
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return newWs, nil
 }

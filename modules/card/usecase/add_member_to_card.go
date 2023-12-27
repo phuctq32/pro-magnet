@@ -8,7 +8,11 @@ import (
 	"slices"
 )
 
-func (uc *cardUseCase) AddMemberToCard(ctx context.Context, requesterId, cardId, memberId string) error {
+func (uc *cardUseCase) AddMemberToCard(
+	ctx context.Context,
+	requesterId, cardId string,
+	memberIds []string,
+) error {
 	card, err := uc.cardRepo.FindById(ctx, cardId)
 	if err != nil {
 		return err
@@ -26,17 +30,19 @@ func (uc *cardUseCase) AddMemberToCard(ctx context.Context, requesterId, cardId,
 		return common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
 	}
 
-	isBoardMember, err = uc.bmRepo.IsBoardMember(ctx, card.BoardId, memberId)
-	if err != nil {
-		return err
-	}
-	if !isBoardMember {
-		return common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
+	for _, id := range memberIds {
+		isBoardMember, err = uc.bmRepo.IsBoardMember(ctx, card.BoardId, id)
+		if err != nil {
+			return err
+		}
+		if !isBoardMember {
+			return common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
+		}
+
+		if slices.Contains(card.MemberIds, id) {
+			return common.NewBadRequestErr(cardmodel.ErrUserAddedToCardBefore)
+		}
 	}
 
-	if slices.Contains(card.MemberIds, memberId) {
-		return common.NewBadRequestErr(cardmodel.ErrUserAddedToCardBefore)
-	}
-
-	return uc.cardRepo.UpdateMembers(ctx, cardId, memberId)
+	return uc.cardRepo.UpdateMembers(ctx, cardId, memberIds)
 }

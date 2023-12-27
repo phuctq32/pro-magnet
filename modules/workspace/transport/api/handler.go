@@ -7,6 +7,8 @@ import (
 
 type WorkspaceUseCase interface {
 	CreateWorkspace(ctx context.Context, userId string, data *wrkspmodel.WorkspaceCreation) (*wrkspmodel.Workspace, error)
+	GetWorkspaceById(ctx context.Context, requesterId, workspaceId string) (*wrkspmodel.Workspace, error)
+	UpdateWorkspace(ctx context.Context, requesterId, workspaceId string, updateData *wrkspmodel.WorkspaceUpdate) error
 }
 
 type wsHandler struct {

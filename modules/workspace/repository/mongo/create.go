@@ -13,11 +13,6 @@ func (repo *wsRepository) Create(
 	data *wsmodel.WorkspaceCreation,
 ) (*wsmodel.Workspace, error) {
 	ownerOid, _ := primitive.ObjectIDFromHex(data.OwnerUserId)
-	memberOids := make([]primitive.ObjectID, 0, len(data.MemberIds))
-	for _, id := range data.MemberIds {
-		oid, _ := primitive.ObjectIDFromHex(id)
-		memberOids = append(memberOids, oid)
-	}
 	now := time.Now()
 
 	wsInsert := &wsmodel.WorkspaceInsert{
@@ -26,7 +21,6 @@ func (repo *wsRepository) Create(
 		OwnerUserId: ownerOid,
 		Name:        data.Name,
 		Image:       data.Image,
-		MemberIds:   memberOids,
 	}
 
 	result, err := repo.db.
@@ -45,6 +39,5 @@ func (repo *wsRepository) Create(
 		Name:        wsInsert.Name,
 		Image:       wsInsert.Image,
 		OwnerUserId: data.OwnerUserId,
-		MemberIds:   data.MemberIds,
 	}, nil
 }

@@ -13,7 +13,7 @@ func (hdl *userHandler) GetUsersToAddToCard(appCtx appcontext.AppContext) gin.Ha
 		requesterId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
 
 		cardIdData := struct {
-			CardId string `json:"id" validate:"required,mongodb"`
+			CardId string `json:"cardId" validate:"required,mongodb"`
 		}{
 			CardId: strings.TrimSpace(c.Query("cardId")),
 		}

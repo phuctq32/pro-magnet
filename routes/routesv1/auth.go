@@ -12,12 +12,14 @@ import (
 	authuc "pro-magnet/modules/auth/usecase"
 	userrepo "pro-magnet/modules/user/repository/mongo"
 	wsrepo "pro-magnet/modules/workspace/repository/mongo"
+	wsmemberrepo "pro-magnet/modules/workspacemember/repository/mongo"
 )
 
 func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	// Setup dependencies
 	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
 	wsRepo := wsrepo.NewWorkspaceRepository(appCtx.DBConnection())
+	wsMemberRepo := wsmemberrepo.NewWorkspaceMemberRepository(appCtx.DBConnection())
 	authRedisRepo := authrepo.NewAuthRedisRepository(appCtx.RedisClient())
 	ggOauth := ggoauth2.NewGoogleOAuth2(
 		appCtx.EnvConfigs().GoogleOAuth().ClientId(),
@@ -31,6 +33,7 @@ func NewAuthRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		userRepo,
 		authRedisRepo,
 		wsRepo,
+		wsMemberRepo,
 		ggOauth,
 		hasher,
 		sgMailer,

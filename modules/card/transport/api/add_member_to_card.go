@@ -23,7 +23,7 @@ func (hdl *cardHandler) AddMemberToCard(appCtx appcontext.AppContext) gin.Handle
 		}
 
 		data := struct {
-			UserId string `json:"userId" validate:"required,mongodb"`
+			UserIds []string `json:"userIds" validate:"required,dive,mongodb"`
 		}{}
 
 		if err := c.ShouldBind(&data); err != nil {
@@ -38,11 +38,11 @@ func (hdl *cardHandler) AddMemberToCard(appCtx appcontext.AppContext) gin.Handle
 			c.Request.Context(),
 			requesterId,
 			cardIdData.CardId,
-			data.UserId,
+			data.UserIds,
 		); err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, common.NewResponse("added user to card", nil))
+		c.JSON(http.StatusOK, common.NewResponse("added users to card", nil))
 	}
 }

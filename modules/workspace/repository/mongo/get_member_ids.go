@@ -8,10 +8,10 @@ import (
 func (repo *wsRepository) GetMemberIds(ctx context.Context, workspaceId string) ([]string, error) {
 	wsOid, _ := primitive.ObjectIDFromHex(workspaceId)
 
-	ws, err := repo.FindOne(ctx, map[string]interface{}{"_id": wsOid})
+	_, err := repo.FindOne(ctx, map[string]interface{}{"_id": wsOid})
 	if err != nil {
 		return nil, err
 	}
 
-	return ws.MemberIds, nil
+	return []string{}, nil
 }

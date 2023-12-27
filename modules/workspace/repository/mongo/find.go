@@ -2,6 +2,8 @@ package wsrepo
 
 import (
 	"context"
+	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"pro-magnet/common"
 	wsmodel "pro-magnet/modules/workspace/model"
@@ -24,6 +26,18 @@ func (repo *wsRepository) FindOne(
 	}
 
 	return &result, nil
+}
+
+func (repo *wsRepository) FindById(
+	ctx context.Context,
+	id string,
+) (*wsmodel.Workspace, error) {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid object Id"))
+	}
+
+	return repo.FindOne(ctx, map[string]interface{}{"_id": oid})
 }
 
 func (repo *wsRepository) FindByName(
