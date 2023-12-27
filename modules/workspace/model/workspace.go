@@ -2,6 +2,8 @@ package wsmodel
 
 import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	boardmodel "pro-magnet/modules/board/model"
+	usermodel "pro-magnet/modules/user/model"
 	"time"
 )
 
@@ -25,4 +27,8 @@ type Workspace struct {
 	OwnerUserId string    `json:"ownerUserId" bson:"ownerUserId"`
 	Name        string    `json:"name" bson:"name"`
 	Image       string    `json:"image" bson:"image"`
+
+	// Aggregated data
+	Boards  []boardmodel.Board `json:"boards,omitempty"`
+	Members []usermodel.User   `json:"members,omitempty"`
 }

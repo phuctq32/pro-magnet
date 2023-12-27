@@ -44,6 +44,7 @@ func (repo *userRepository) FindSimpleUsersByIds(
 	projectionOpt := options.Find().SetProjection(bson.M{
 		"_id":    1,
 		"name":   1,
+		"email":  1,
 		"avatar": 1,
 	})
 

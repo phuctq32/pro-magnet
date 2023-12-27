@@ -8,10 +8,15 @@ import (
 	"pro-magnet/components/mailer"
 	usermodel "pro-magnet/modules/user/model"
 	wsmodel "pro-magnet/modules/workspace/model"
+	wsmembermodel "pro-magnet/modules/workspacemember/model"
 )
 
 type WorkspaceRepository interface {
 	Create(ctx context.Context, data *wsmodel.WorkspaceCreation) (*wsmodel.Workspace, error)
+}
+
+type WorkspaceMemberRepository interface {
+	CreateMany(ctx context.Context, data *wsmembermodel.WorkspaceMembersCreate) error
 }
 
 type UserRepository interface {
@@ -35,6 +40,7 @@ type authUseCase struct {
 	userRepo                     UserRepository
 	redisRepo                    AuthRedisRepository
 	wsRepo                       WorkspaceRepository
+	wsMemberRepo                 WorkspaceMemberRepository
 	ggOauth                      ggoauth2.GoogleOAuth
 	hasher                       hasher.Hasher
 	mailer                       mailer.Mailer
@@ -54,6 +60,7 @@ func NewAuthUseCase(
 	userRepo UserRepository,
 	authRedisRepo AuthRedisRepository,
 	wsRepo WorkspaceRepository,
+	wsMemberRepo WorkspaceMemberRepository,
 	ggOauth ggoauth2.GoogleOAuth,
 	hasher hasher.Hasher,
 	mailer mailer.Mailer,
@@ -72,6 +79,7 @@ func NewAuthUseCase(
 		userRepo:                     userRepo,
 		redisRepo:                    authRedisRepo,
 		wsRepo:                       wsRepo,
+		wsMemberRepo:                 wsMemberRepo,
 		ggOauth:                      ggOauth,
 		hasher:                       hasher,
 		mailer:                       mailer,

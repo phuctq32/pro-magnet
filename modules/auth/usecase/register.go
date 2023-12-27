@@ -6,6 +6,7 @@ import (
 	authmodel "pro-magnet/modules/auth/model"
 	usermodel "pro-magnet/modules/user/model"
 	wsmodel "pro-magnet/modules/workspace/model"
+	wsmembermodel "pro-magnet/modules/workspacemember/model"
 	"time"
 )
 
@@ -51,7 +52,17 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 			OwnerUserId: newUser.UserId(),
 			Image:       wsmodel.DefaultImageUrl,
 		}
-		if _, e = uc.wsRepo.Create(ctx, defaultWorkspace); e != nil {
+		ws, e := uc.wsRepo.Create(ctx, defaultWorkspace)
+		if e != nil {
+			return e
+		}
+
+		// Add user to workspace member
+		wsMember := &wsmembermodel.WorkspaceMembersCreate{
+			WorkspaceId: *ws.Id,
+			UserIds:     []string{*userId},
+		}
+		if e = uc.wsMemberRepo.CreateMany(ctx, wsMember); e != nil {
 			return e
 		}
 
