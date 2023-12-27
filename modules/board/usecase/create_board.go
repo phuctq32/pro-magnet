@@ -4,7 +4,6 @@ import (
 	"context"
 	boardmodel "pro-magnet/modules/board/model"
 	bmmodel "pro-magnet/modules/boardmember/model"
-	"slices"
 )
 
 func (uc *boardUseCase) CreateBoard(
@@ -12,9 +11,9 @@ func (uc *boardUseCase) CreateBoard(
 	data *boardmodel.BoardCreation,
 ) (board *boardmodel.Board, err error) {
 	checkBoardNameExistedTask := func(ctx context.Context) error {
-		ok, err := uc.boardRepo.ExistsInWorkspace(ctx, data.Name, data.WorkspaceId)
-		if err != nil {
-			return err
+		ok, e := uc.boardRepo.ExistsInWorkspace(ctx, nil, data.Name, data.WorkspaceId)
+		if e != nil {
+			return e
 		}
 		if ok {
 			return boardmodel.ErrExistedBoard
@@ -23,13 +22,14 @@ func (uc *boardUseCase) CreateBoard(
 	}
 
 	checkBoardAdIsWorkspaceMember := func(ctx context.Context) error {
-		wsMemberIds, err := uc.wsRepo.GetMemberIds(ctx, data.WorkspaceId)
-		if err != nil {
-			return err
+		isWsMember, e := uc.wsMemberRepo.IsWorkspaceMember(ctx, data.WorkspaceId, data.UserId)
+		if e != nil {
+			return e
 		}
-		if !slices.Contains(wsMemberIds, data.UserId) {
+		if !isWsMember {
 			return boardmodel.ErrIsNotMemberOfWorkspace
 		}
+
 		return nil
 	}
 

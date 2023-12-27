@@ -22,8 +22,19 @@ func (uc *boardUseCase) UpdateBoard(
 		}
 
 		// Check requester is board admin
-		if updateData.Name != nil && requesterId != board.AdminId {
-			return common.NewBadRequestErr(boardmodel.ErrUserNotBoardAdmin)
+		if updateData.Name != nil {
+			if requesterId != board.AdminId {
+				return common.NewBadRequestErr(boardmodel.ErrUserNotBoardAdmin)
+			}
+			isBoardNameExistInWs, err := uc.boardRepo.ExistsInWorkspace(
+				ctx, board.Id, *updateData.Name, board.WorkspaceId,
+			)
+			if err != nil {
+				return err
+			}
+			if isBoardNameExistInWs {
+				return boardmodel.ErrExistedBoard
+			}
 		}
 
 		isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, boardId, requesterId)

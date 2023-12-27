@@ -11,15 +11,15 @@ import (
 	bmapi "pro-magnet/modules/boardmember/transport/api"
 	bmuc "pro-magnet/modules/boardmember/usecase"
 	userrepo "pro-magnet/modules/user/repository/mongo"
-	wsrepo "pro-magnet/modules/workspace/repository/mongo"
+	wsmemberrepo "pro-magnet/modules/workspacemember/repository/mongo"
 )
 
 func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	boardRepo := boardrepo.NewBoardRepository(appCtx.DBConnection())
 	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
-	wsRepo := wsrepo.NewWorkspaceRepository(appCtx.DBConnection())
+	wsMemberRepo := wsmemberrepo.NewWorkspaceMemberRepository(appCtx.DBConnection())
 
-	boardUC := boarduc.NewBoardUseCase(boardRepo, bmRepo, wsRepo, appCtx.AsyncGroup())
+	boardUC := boarduc.NewBoardUseCase(boardRepo, bmRepo, wsMemberRepo, appCtx.AsyncGroup())
 
 	boardHdl := boardapi.NewBoardHandler(boardUC)
 
