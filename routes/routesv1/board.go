@@ -26,6 +26,7 @@ func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	boardRouter := router.Group("/boards", middlewares.Authorize(appCtx))
 	{
 		boardRouter.POST("", boardHdl.CreateBoard(appCtx))
+		boardRouter.PATCH("/:boardId", boardHdl.UpdateBoard(appCtx))
 	}
 
 	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
