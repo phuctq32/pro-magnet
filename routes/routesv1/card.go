@@ -10,6 +10,7 @@ import (
 	carduc "pro-magnet/modules/card/usecase"
 	carepo "pro-magnet/modules/cardattachment/repository/mongo"
 	columnrepo "pro-magnet/modules/column/repository/mongo"
+	labelrepo "pro-magnet/modules/label/repository/mongo"
 	userrepo "pro-magnet/modules/user/repository/mongo"
 )
 
@@ -19,8 +20,9 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	colRepo := columnrepo.NewColumnRepository(appCtx.DBConnection())
 	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
 	caRepo := carepo.NewCardAttachmentRepository(appCtx.DBConnection())
-	cardDataAggregator := carduc.NewCardDataAggregator(appCtx.AsyncGroup(), caRepo, userRepo)
-	cardUC := carduc.NewCardUseCase(cardRepo, colRepo, bmRepo, cardDataAggregator)
+	labelRepo := labelrepo.NewLabelRepository(appCtx.DBConnection())
+	cardDataAggregator := carduc.NewCardDataAggregator(appCtx.AsyncGroup(), caRepo, userRepo, labelRepo)
+	cardUC := carduc.NewCardUseCase(cardRepo, colRepo, bmRepo, labelRepo, cardDataAggregator)
 	cardHdl := cardapi.NewCardHandler(cardUC)
 
 	cardRouter := router.Group("/cards", middlewares.Authorize(appCtx))
@@ -34,5 +36,7 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 
 		cardRouter.POST("/:cardId/members", cardHdl.AddMemberToCard(appCtx))
 		cardRouter.DELETE("/:cardId/members/:memberId", cardHdl.RemoveMemberFromCard(appCtx))
+
+		cardRouter.POST("/:cardId/labels", cardHdl.AddLabelToCard(appCtx))
 	}
 }

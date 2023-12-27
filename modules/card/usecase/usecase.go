@@ -4,6 +4,7 @@ import (
 	"context"
 	cardmodel "pro-magnet/modules/card/model"
 	columnmodel "pro-magnet/modules/column/model"
+	labelmodel "pro-magnet/modules/label/model"
 )
 
 type BoardMemberRepository interface {
@@ -15,6 +16,11 @@ type ColumnRepository interface {
 	UpdateById(ctx context.Context, id string, updateData *columnmodel.ColumnUpdate) (*columnmodel.Column, error)
 }
 
+type LabelRepository interface {
+	FindById(ctx context.Context, labelId string) (*labelmodel.Label, error)
+	ExistsInBoard(ctx context.Context, labelId *string, boardId, title, color string) (bool, error)
+}
+
 type CardRepository interface {
 	Create(ctx context.Context, data *cardmodel.CardCreation) (*cardmodel.Card, error)
 	FindById(ctx context.Context, id string) (*cardmodel.Card, error)
@@ -23,6 +29,7 @@ type CardRepository interface {
 	RemoveDate(ctx context.Context, id string) error
 	UpdateMembers(ctx context.Context, cardId string, memberId []string) error
 	RemoveMember(ctx context.Context, cardId, memberId string) error
+	UpdateLabel(ctx context.Context, cardId string, labelId string) error
 	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 
@@ -31,22 +38,25 @@ type CardDataAggregator interface {
 }
 
 type cardUseCase struct {
-	cardRepo CardRepository
-	colRepo  ColumnRepository
-	bmRepo   BoardMemberRepository
-	cardAgg  CardDataAggregator
+	cardRepo  CardRepository
+	colRepo   ColumnRepository
+	bmRepo    BoardMemberRepository
+	labelRepo LabelRepository
+	cardAgg   CardDataAggregator
 }
 
 func NewCardUseCase(
 	cardRepo CardRepository,
 	colRepo ColumnRepository,
 	bmRepo BoardMemberRepository,
+	labelRepo LabelRepository,
 	cardAgg CardDataAggregator,
 ) *cardUseCase {
 	return &cardUseCase{
-		cardRepo: cardRepo,
-		colRepo:  colRepo,
-		bmRepo:   bmRepo,
-		cardAgg:  cardAgg,
+		cardRepo:  cardRepo,
+		colRepo:   colRepo,
+		bmRepo:    bmRepo,
+		labelRepo: labelRepo,
+		cardAgg:   cardAgg,
 	}
 }

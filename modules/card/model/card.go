@@ -21,6 +21,7 @@ type Card struct {
 	Title       string                             `json:"title" bson:"title"`
 	Description string                             `json:"description" bson:"description"`
 	Cover       *string                            `json:"cover" bson:"cover,omitempty"`
+	LabelIds    []string                           `json:"-" bson:"labelIds,omitempty"`
 	MemberIds   []string                           `json:"-" bson:"memberIds"`
 	Checklists  []cardchecklistmodel.CardChecklist `json:"checklists" bson:"checklists"`
 	Comments    []cardcommentmodel.CardComment     `json:"comments" bson:"comments"`

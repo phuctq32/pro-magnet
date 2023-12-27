@@ -1,6 +1,8 @@
 package cardmodel
 
-import "time"
+import (
+	"time"
+)
 
 type CardUpdate struct {
 	Title       *string `json:"title,omitempty" validate:"omitempty,required" bson:"title,omitempty"`
@@ -12,4 +14,8 @@ type CardUpdate struct {
 type CardDateUpdate struct {
 	StartDate *time.Time `json:"startDate,omitempty" validate:"omitempty" bson:"startDate,omitempty"`
 	EndDate   *time.Time `json:"endDate,omitempty" validate:"omitempty" bson:"endDate,omitempty"`
+}
+
+type CardLabelUpdate struct {
+	LabelIds []string `json:""`
 }
