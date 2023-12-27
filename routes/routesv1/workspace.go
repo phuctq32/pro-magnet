@@ -25,6 +25,7 @@ func NewWorkspaceRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	{
 		wsRouter.POST("", wsHdl.CreateWorkspace(appCtx))
 		wsRouter.GET("/:workspaceId", wsHdl.GetWorkspaceById(appCtx))
+		wsRouter.PATCH("/:workspaceId", wsHdl.UpdateWorkspace(appCtx))
 	}
 
 	wsMemberUC := wsmemberuc.NewWorkspaceMemberUseCase(wsMemberRepo, wsRepo)

@@ -10,6 +10,7 @@ type WorkspaceRepository interface {
 	Create(context.Context, *wsmodel.WorkspaceCreation) (*wsmodel.Workspace, error)
 	FindByName(ctx context.Context, name string) (*wsmodel.Workspace, error)
 	FindById(ctx context.Context, workspaceId string) (*wsmodel.Workspace, error)
+	UpdateById(ctx context.Context, workspaceId string, updateData *wsmodel.WorkspaceUpdate) error
 	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 
