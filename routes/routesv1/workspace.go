@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"pro-magnet/components/appcontext"
 	"pro-magnet/middlewares"
+	boardrepo "pro-magnet/modules/board/repository/mongo"
 	userrepo "pro-magnet/modules/user/repository/mongo"
 	"pro-magnet/modules/workspace/repository/mongo"
 	"pro-magnet/modules/workspace/transport/api"
@@ -17,13 +18,15 @@ func NewWorkspaceRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	wsRepo := wsrepo.NewWorkspaceRepository(appCtx.DBConnection())
 	wsMemberRepo := wsmemberrepo.NewWorkspaceMemberRepository(appCtx.DBConnection())
 	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
-	wsAgg := wsuc.NewWorkspaceAggregator(appCtx.AsyncGroup(), userRepo, wsMemberRepo)
+	boardRepo := boardrepo.NewBoardRepository(appCtx.DBConnection())
+	wsAgg := wsuc.NewWorkspaceAggregator(appCtx.AsyncGroup(), userRepo, wsMemberRepo, boardRepo)
 	wsUC := wsuc.NewWorkspaceUseCase(wsRepo, wsMemberRepo, wsAgg)
 	wsHdl := wsapi.NewWorkspaceHandler(wsUC)
 
 	wsRouter := router.Group("/workspaces", middlewares.Authorize(appCtx))
 	{
 		wsRouter.POST("", wsHdl.CreateWorkspace(appCtx))
+		wsRouter.GET("", wsHdl.GetCurrentUserWorkspaces(appCtx))
 		wsRouter.GET("/:workspaceId", wsHdl.GetWorkspaceById(appCtx))
 		wsRouter.PATCH("/:workspaceId", wsHdl.UpdateWorkspace(appCtx))
 	}

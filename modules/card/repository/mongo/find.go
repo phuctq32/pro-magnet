@@ -112,6 +112,7 @@ func (repo *cardRepository) FindByColumnId(
 		bson.M{"$sort": bson.M{"orderInColumn": 1}},
 		bson.M{"$project": bson.M{
 			"_id":          1,
+			"columnId":     1,
 			"title":        1,
 			"cover":        1,
 			"labelIds":     1,

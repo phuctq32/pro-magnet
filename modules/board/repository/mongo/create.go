@@ -19,6 +19,7 @@ func (repo *boardRepository) Create(
 	boardInsert := &boardmodel.BoardInsert{
 		CreatedAt:        now,
 		UpdatedAt:        now,
+		Status:           boardmodel.Active,
 		Name:             data.Name,
 		WorkspaceId:      wsOid,
 		AdminId:          adminOid,

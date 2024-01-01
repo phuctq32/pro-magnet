@@ -41,3 +41,36 @@ func (repo *wsMemberRepository) FindMemberIdsByWorkspaceId(
 
 	return result, nil
 }
+
+func (repo *wsMemberRepository) FindWorkspaceIdsByMemberId(
+	ctx context.Context,
+	memberId string,
+) ([]string, error) {
+	memberOid, err := primitive.ObjectIDFromHex(memberId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	cursor, err := repo.db.
+		Collection(wsmembermodel.WorkspaceMemberCollectionName).
+		Find(ctx, bson.M{"userId": memberOid})
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	var wsMembers []wsmembermodel.WorkspaceMember
+	if err = cursor.All(ctx, &wsMembers); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	if wsMembers == nil {
+		return []string{}, nil
+	}
+
+	result := make([]string, 0)
+	for i := 0; i < len(wsMembers); i++ {
+		result = append(result, wsMembers[i].WorkspaceId)
+	}
+
+	return result, nil
+}

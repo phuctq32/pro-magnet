@@ -28,6 +28,6 @@ type Board struct {
 	OrderedColumnIds []string    `json:"orderedColumnIds" bson:"orderedColumnIds"`
 
 	// Aggregated data
-	Labels  []labelmodel.Label   `json:"labels" bson:"-"`
-	Columns []columnmodel.Column `json:"columns" bson:"-"`
+	Labels  []labelmodel.Label   `json:"labels,omitempty" bson:"-"`
+	Columns []columnmodel.Column `json:"columns,omitempty" bson:"-"`
 }
