@@ -17,7 +17,7 @@ func (uc *cardUseCase) RemoveCardDate(ctx context.Context, requesterId, cardId s
 	}
 
 	// Check user is a member of card's board
-	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, card.BoardId, requesterId)
+	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, *card.BoardId, requesterId)
 	if err != nil {
 		return err
 	}

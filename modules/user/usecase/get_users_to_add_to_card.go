@@ -21,7 +21,7 @@ func (uc *userUseCase) GetUsersToAddToCard(
 	}
 
 	// Check user is a member of card's board
-	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, card.BoardId, requesterId)
+	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, *card.BoardId, requesterId)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (uc *userUseCase) GetUsersToAddToCard(
 		return nil, common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
 	}
 
-	boardMemberIds, err := uc.bmRepo.FindMemberIdsByBoardId(ctx, card.BoardId)
+	boardMemberIds, err := uc.bmRepo.FindMemberIdsByBoardId(ctx, *card.BoardId)
 	if err != nil {
 		return nil, err
 	}

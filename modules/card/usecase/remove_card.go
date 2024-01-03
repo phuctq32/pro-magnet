@@ -5,13 +5,11 @@ import (
 	"pro-magnet/common"
 	cardmodel "pro-magnet/modules/card/model"
 	columnmodel "pro-magnet/modules/column/model"
-	"slices"
 )
 
-func (uc *cardUseCase) AddMemberToCard(
+func (uc *cardUseCase) RemoveCard(
 	ctx context.Context,
 	requesterId, cardId string,
-	memberIds []string,
 ) error {
 	card, err := uc.cardRepo.FindById(ctx, cardId)
 	if err != nil {
@@ -21,7 +19,7 @@ func (uc *cardUseCase) AddMemberToCard(
 		return common.NewBadRequestErr(cardmodel.ErrCardDeleted)
 	}
 
-	// Check requester and user are members of card's board
+	// Check user is a member of card's board
 	isBoardMember, err := uc.bmRepo.IsBoardMember(ctx, *card.BoardId, requesterId)
 	if err != nil {
 		return err
@@ -30,19 +28,15 @@ func (uc *cardUseCase) AddMemberToCard(
 		return common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
 	}
 
-	for _, id := range memberIds {
-		isBoardMember, err = uc.bmRepo.IsBoardMember(ctx, *card.BoardId, id)
-		if err != nil {
-			return err
-		}
-		if !isBoardMember {
-			return common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
+	return uc.cardRepo.WithTransaction(ctx, func(txCtx context.Context) error {
+		if e := uc.colRepo.RemoveCardId(ctx, *card.ColumnId, *card.Id); e != nil {
+			return e
 		}
 
-		if slices.Contains(card.MemberIds, id) {
-			return common.NewBadRequestErr(cardmodel.ErrUserAddedToCardBefore)
+		if e := uc.cardRepo.DeleteById(ctx, *card.Id); e != nil {
+			return e
 		}
-	}
 
-	return uc.cardRepo.UpdateMembers(ctx, cardId, memberIds)
+		return nil
+	})
 }

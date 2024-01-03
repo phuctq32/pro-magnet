@@ -17,6 +17,7 @@ func (repo *labelRepository) Create(
 	}
 
 	insertData := &labelmodel.LabelInsert{
+		Status:  labelmodel.Active,
 		Title:   data.Title,
 		Color:   data.Color,
 		BoardId: boardOid,

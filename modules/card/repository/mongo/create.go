@@ -25,11 +25,11 @@ func (repo *cardRepository) Create(
 
 	return &cardmodel.Card{
 		Id:         &insertedId,
-		CreatedAt:  insertData.CreatedAt,
-		UpdatedAt:  insertData.UpdatedAt,
+		CreatedAt:  &insertData.CreatedAt,
+		UpdatedAt:  &insertData.UpdatedAt,
 		Status:     insertData.Status,
-		ColumnId:   data.ColumnId,
-		BoardId:    data.BoardId,
+		ColumnId:   &data.ColumnId,
+		BoardId:    &data.BoardId,
 		Title:      data.Title,
 		Cover:      nil,
 		MemberIds:  []string{},

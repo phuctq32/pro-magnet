@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"pro-magnet/components/appcontext"
 	"pro-magnet/middlewares"
+	boardrepo "pro-magnet/modules/board/repository/mongo"
 	boardmemberrepo "pro-magnet/modules/boardmember/repository/mongo"
 	"pro-magnet/modules/card/repository/mongo"
 	columnrepo "pro-magnet/modules/column/repository/mongo"
@@ -14,8 +15,9 @@ import (
 func NewColumnRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	colRepo := columnrepo.NewColumnRepository(appCtx.DBConnection())
 	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
+	boardRepo := boardrepo.NewBoardRepository(appCtx.DBConnection())
 	cardRepo := mongo.NewCardRepository(appCtx.DBConnection())
-	colUC := columnuc.NewColumnUseCase(colRepo, bmRepo, cardRepo)
+	colUC := columnuc.NewColumnUseCase(colRepo, bmRepo, boardRepo, cardRepo)
 	colHdl := columnapi.NewColumnHandler(colUC)
 
 	colRouter := router.Group("/columns", middlewares.Authorize(appCtx))

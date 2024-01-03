@@ -77,3 +77,68 @@ func (repo *cardRepository) FindCardIdsByLabelId(
 
 	return res, nil
 }
+
+func (repo *cardRepository) FindByColumnId(
+	ctx context.Context,
+	status cardmodel.CardStatus,
+	columnId string,
+	cardIdsOrder []string,
+) ([]cardmodel.Card, error) {
+	columnOid, err := primitive.ObjectIDFromHex(columnId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	cardOids := make([]primitive.ObjectID, 0)
+	for _, id := range cardIdsOrder {
+		oid, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+		}
+		cardOids = append(cardOids, oid)
+	}
+
+	aggPipeline := bson.A{
+		bson.M{"$match": bson.M{
+			"$and": bson.A{
+				bson.M{"columnId": columnOid},
+				bson.M{"status": status},
+			},
+		}},
+		bson.M{"$addFields": bson.M{
+			"memberCount":   bson.M{"$size": "$memberIds"},
+			"commentCount":  bson.M{"$size": "$comments"},
+			"orderInColumn": bson.M{"$indexOfArray": bson.A{cardOids, "$_id"}},
+		}},
+		bson.M{"$sort": bson.M{"orderInColumn": 1}},
+		bson.M{"$project": bson.M{
+			"_id":          1,
+			"columnId":     1,
+			"title":        1,
+			"cover":        1,
+			"labelIds":     1,
+			"startDate":    1,
+			"endDate":      1,
+			"isDone":       1,
+			"memberCount":  1,
+			"commentCount": 1,
+		}},
+	}
+
+	cursor, err := repo.db.
+		Collection(cardmodel.CardCollectionName).
+		Aggregate(ctx, aggPipeline)
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	cards := make([]cardmodel.Card, 0)
+	if err = cursor.All(ctx, &cards); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	if cards == nil {
+		return []cardmodel.Card{}, nil
+	}
+
+	return cards, err
+}

@@ -21,7 +21,7 @@ func (uc *cardUseCase) AddLabelToCard(
 			return common.NewBadRequestErr(cardmodel.ErrCardDeleted)
 		}
 
-		isBoardMember, err := uc.bmRepo.IsBoardMember(txCtx, card.BoardId, requesterId)
+		isBoardMember, err := uc.bmRepo.IsBoardMember(txCtx, *card.BoardId, requesterId)
 		if err != nil {
 			return err
 		}
@@ -37,7 +37,7 @@ func (uc *cardUseCase) AddLabelToCard(
 			return common.NewBadRequestErr(labelmodel.ErrLabelDeleted)
 		}
 
-		if label.BoardId != card.BoardId {
+		if label.BoardId != *card.BoardId {
 			return common.NewBadRequestErr(labelmodel.ErrLabelNotExistInBoard)
 		}
 

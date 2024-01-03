@@ -10,22 +10,34 @@ import (
 	boardmemberrepo "pro-magnet/modules/boardmember/repository/mongo"
 	bmapi "pro-magnet/modules/boardmember/transport/api"
 	bmuc "pro-magnet/modules/boardmember/usecase"
+	"pro-magnet/modules/card/repository/mongo"
+	carepo "pro-magnet/modules/cardattachment/repository/mongo"
+	columnrepo "pro-magnet/modules/column/repository/mongo"
+	labelrepo "pro-magnet/modules/label/repository/mongo"
 	userrepo "pro-magnet/modules/user/repository/mongo"
-	wsrepo "pro-magnet/modules/workspace/repository/mongo"
+	wsmemberrepo "pro-magnet/modules/workspacemember/repository/mongo"
 )
 
 func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	boardRepo := boardrepo.NewBoardRepository(appCtx.DBConnection())
 	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
-	wsRepo := wsrepo.NewWorkspaceRepository(appCtx.DBConnection())
+	wsMemberRepo := wsmemberrepo.NewWorkspaceMemberRepository(appCtx.DBConnection())
 
-	boardUC := boarduc.NewBoardUseCase(boardRepo, bmRepo, wsRepo, appCtx.AsyncGroup())
+	colRepo := columnrepo.NewColumnRepository(appCtx.DBConnection())
+	cardRepo := mongo.NewCardRepository(appCtx.DBConnection())
+	caRepo := carepo.NewCardAttachmentRepository(appCtx.DBConnection())
+	labelRepo := labelrepo.NewLabelRepository(appCtx.DBConnection())
+	boardAgg := boarduc.NewBoardAggregator(appCtx.AsyncGroup(), colRepo, cardRepo, caRepo, labelRepo)
+
+	boardUC := boarduc.NewBoardUseCase(boardRepo, bmRepo, wsMemberRepo, boardAgg, appCtx.AsyncGroup())
 
 	boardHdl := boardapi.NewBoardHandler(boardUC)
 
 	boardRouter := router.Group("/boards", middlewares.Authorize(appCtx))
 	{
 		boardRouter.POST("", boardHdl.CreateBoard(appCtx))
+		boardRouter.PATCH("/:boardId", boardHdl.UpdateBoard(appCtx))
+		boardRouter.GET("/:boardId", boardHdl.GetBoardById(appCtx))
 	}
 
 	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())

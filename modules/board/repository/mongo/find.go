@@ -39,3 +39,37 @@ func (repo *boardRepository) FindById(
 
 	return repo.FindOne(ctx, map[string]interface{}{"_id": oid})
 }
+
+func (repo *boardRepository) Find(
+	ctx context.Context,
+	status boardmodel.BoardStatus,
+	filter map[string]interface{},
+) ([]boardmodel.Board, error) {
+	filter["status"] = status
+	cursor, err := repo.db.
+		Collection(boardmodel.BoardCollectionName).
+		Find(ctx, filter)
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	result := make([]boardmodel.Board, 0)
+	if err = cursor.All(ctx, &result); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	return result, nil
+}
+
+func (repo *boardRepository) FindByWorkspaceId(
+	ctx context.Context,
+	status boardmodel.BoardStatus,
+	workspaceId string,
+) ([]boardmodel.Board, error) {
+	wsOid, err := primitive.ObjectIDFromHex(workspaceId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	return repo.Find(ctx, status, map[string]interface{}{"workspaceId": wsOid})
+}

@@ -20,9 +20,12 @@ func (repo *labelRepository) Find(
 		return nil, common.NewServerErr(err)
 	}
 
-	labels := make([]labelmodel.Label, 0)
+	var labels []labelmodel.Label
 	if err = cursor.All(ctx, &labels); err != nil {
 		return nil, err
+	}
+	if labels == nil {
+		return []labelmodel.Label{}, nil
 	}
 
 	return labels, nil
@@ -43,4 +46,19 @@ func (repo *labelRepository) FindByIds(
 	}
 
 	return repo.Find(ctx, status, map[string]interface{}{"_id": bson.M{"$in": labelOids}})
+}
+
+func (repo *labelRepository) FindByBoardId(
+	ctx context.Context,
+	labelStatus labelmodel.LabelStatus,
+	boardId string,
+) ([]labelmodel.Label, error) {
+	boardOid, err := primitive.ObjectIDFromHex(boardId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	return repo.Find(ctx, labelStatus, map[string]interface{}{
+		"boardId": boardOid,
+	})
 }
