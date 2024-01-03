@@ -12,6 +12,9 @@ type UserUseCase interface {
 
 	GetUsersToAddToCard(ctx context.Context, requesterId, cardId string) ([]usermodel.User, error)
 	GetUsersToAddToWorkspace(ctx context.Context, requesterId, workspaceId, emailSearchQuery string) ([]usermodel.User, error)
+
+	AddSkils(ctx context.Context, requesterId string, skills []string) error
+	RemoveSkill(ctx context.Context, requesterId string, skill string) error
 }
 
 type userHandler struct {

@@ -42,6 +42,7 @@ func (uc *authUseCase) LoginWithGoogle(
 			Avatar:      ggUser.Avatar,
 			PhoneNumber: ggUser.Phonenumber,
 			Birthday:    ggUser.Birthday,
+			Skills:      make([]string, 0),
 		}
 		userType := usermodel.GoogleUser
 		user.Type = &userType

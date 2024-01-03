@@ -29,6 +29,7 @@ type CardInsert struct {
 	StartDate   *time.Time                         `bson:"startDate,omitempty"`
 	EndDate     *time.Time                         `bson:"endDate,omitempty"`
 	IsDone      bool                               `bson:"isDone"`
+	Skills      []string                           `bson:"skills,omitempty"`
 }
 
 func (cc *CardCreation) ToCardInsert() (*CardInsert, error) {

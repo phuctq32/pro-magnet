@@ -32,6 +32,8 @@ type CardRepository interface {
 	UpdateMembers(ctx context.Context, cardId string, memberId []string) error
 	RemoveMember(ctx context.Context, cardId, memberId string) error
 	UpdateLabel(ctx context.Context, cardId string, labelId string) error
+	UpdateSkills(ctx context.Context, cardId string, skills []string) error
+	RemoveSkill(ctx context.Context, cardId, skill string) error
 	WithTransaction(ctx context.Context, fn func(context.Context) error) error
 }
 

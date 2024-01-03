@@ -39,5 +39,8 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		cardRouter.DELETE("/:cardId/members/:memberId", cardHdl.RemoveMemberFromCard(appCtx))
 
 		cardRouter.POST("/:cardId/labels", cardHdl.AddLabelToCard(appCtx))
+
+		cardRouter.POST("/:cardId/skills", cardHdl.AddSkills(appCtx))
+		cardRouter.DELETE("/:cardId/skills", cardHdl.RemoveSkill(appCtx))
 	}
 }

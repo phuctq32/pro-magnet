@@ -7,4 +7,6 @@ var (
 	ErrCardDeleted           = errors.New("card already deleted")
 	ErrUserAddedToCardBefore = errors.New("user already added to card")
 	ErrUserNotExistInCard    = errors.New("user not a member of card")
+	ErrSkillAlreadyExisted   = errors.New("skill already existed")
+	ErrSkillNotFound         = errors.New("skill not found")
 )

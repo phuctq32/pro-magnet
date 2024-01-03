@@ -14,6 +14,8 @@ type UserRepository interface {
 	UpdateById(ctx context.Context, id string, updateData *usermodel.UserUpdate) (*usermodel.User, error)
 	FindSimpleUsersByIds(ctx context.Context, userIds []string) ([]usermodel.User, error)
 	SearchUsersByEmail(ctx context.Context, emailSearchStr string, exceptedUserIds []string) ([]usermodel.User, error)
+	UpdateSkills(ctx context.Context, userId string, skills []string) error
+	RemoveSkill(ctx context.Context, userId, skill string) error
 }
 
 type CardRepository interface {
