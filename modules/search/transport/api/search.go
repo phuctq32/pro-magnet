@@ -1,4 +1,4 @@
-package userapi
+package searchapi
 
 import (
 	"github.com/gin-gonic/gin"
@@ -8,24 +8,25 @@ import (
 	"strings"
 )
 
-func (hdl *userHandler) RemoveSkill(appCtx appcontext.AppContext) gin.HandlerFunc {
+func (hdl *searchHandler) Search(appCtx appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requesterId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
 
 		data := struct {
-			Skill string `json:"skill" validate:"required"`
+			SearchTerm string `json:"searchTerm" validate:"required"`
 		}{
-			Skill: strings.TrimSpace(c.Query("value")),
+			SearchTerm: strings.TrimSpace(c.Query("q")),
 		}
 
 		if errs := appCtx.Validator().Validate(&data); errs != nil {
 			panic(common.NewValidationErrors(errs))
 		}
 
-		if err := hdl.uc.RemoveSkill(c.Request.Context(), requesterId, data.Skill); err != nil {
+		searchData, err := hdl.uc.Search(c.Request.Context(), requesterId, data.SearchTerm)
+		if err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, common.NewResponse("removed skill", nil))
+		c.JSON(http.StatusOK, common.NewResponse("", searchData))
 	}
 }

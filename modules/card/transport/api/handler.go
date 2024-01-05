@@ -15,8 +15,7 @@ type CardUseCase interface {
 	AddMemberToCard(ctx context.Context, requesterId, cardId string, memberIds []string) error
 	RemoveMemberFromCard(ctx context.Context, requesterId, cardId, memberId string) error
 	AddLabelToCard(ctx context.Context, requesterId, cardId, labelId string) error
-	AddSkils(ctx context.Context, requesterId, cardId string, skills []string) error
-	RemoveSkill(ctx context.Context, requesterId, cardId string, skill string) error
+	UpdateSkills(ctx context.Context, requesterId, cardId string, skills []string) error
 }
 
 type cardHandler struct {

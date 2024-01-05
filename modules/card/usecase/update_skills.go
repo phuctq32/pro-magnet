@@ -7,7 +7,7 @@ import (
 	columnmodel "pro-magnet/modules/column/model"
 )
 
-func (uc *cardUseCase) AddSkils(
+func (uc *cardUseCase) UpdateSkills(
 	ctx context.Context,
 	requesterId, cardId string,
 	skills []string,
@@ -26,17 +26,6 @@ func (uc *cardUseCase) AddSkils(
 	}
 	if !isBoardMember {
 		return common.NewBadRequestErr(columnmodel.ErrNotBoardMember)
-	}
-
-	existedSkillMap := map[string]bool{}
-	for _, skill := range card.Skills {
-		existedSkillMap[skill] = true
-	}
-
-	for _, skill := range skills {
-		if existedSkillMap[skill] {
-			return common.NewBadRequestErr(cardmodel.ErrSkillAlreadyExisted)
-		}
 	}
 
 	return uc.cardRepo.UpdateSkills(ctx, cardId, skills)

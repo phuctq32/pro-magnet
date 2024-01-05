@@ -24,26 +24,7 @@ func (repo *userRepository) UpdateSkills(
 		UpdateOne(
 			ctx,
 			bson.M{"_id": userOid},
-			bson.M{"$push": bson.M{"skills": bson.M{"$each": skills}}},
-		)
-
-	return err
-}
-
-func (repo *userRepository) RemoveSkill(
-	ctx context.Context,
-	userId, skill string,
-) error {
-	userOid, err := primitive.ObjectIDFromHex(userId)
-	if err != nil {
-		return common.NewBadRequestErr(errors.New("invalid objectId"))
-	}
-
-	_, err = repo.db.Collection(usermodel.UserCollectionName).
-		UpdateOne(
-			ctx,
-			bson.M{"_id": userOid},
-			bson.M{"$pull": bson.M{"skills": skill}},
+			bson.M{"$set": bson.M{"skills": skills}},
 		)
 
 	return err

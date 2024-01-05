@@ -1,4 +1,4 @@
-package cardapi
+package recomapi
 
 import (
 	"github.com/gin-gonic/gin"
@@ -8,15 +8,13 @@ import (
 	"strings"
 )
 
-func (hdl *cardHandler) RemoveSkill(appCtx appcontext.AppContext) gin.HandlerFunc {
+func (hdl *recomHandler) GetRecommendedUsersForCard(appCtx appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requesterId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
 
 		data := struct {
 			CardId string `json:"cardId" validate:"required,mongodb"`
-			Skill  string `json:"skill" validate:"required"`
 		}{
-			Skill:  strings.TrimSpace(c.Query("value")),
 			CardId: strings.TrimSpace(c.Param("cardId")),
 		}
 
@@ -24,10 +22,11 @@ func (hdl *cardHandler) RemoveSkill(appCtx appcontext.AppContext) gin.HandlerFun
 			panic(common.NewValidationErrors(errs))
 		}
 
-		if err := hdl.uc.RemoveSkill(c.Request.Context(), requesterId, data.CardId, data.Skill); err != nil {
+		users, err := hdl.uc.GetRecommendedUsersForCard(c.Request.Context(), requesterId, data.CardId, 5)
+		if err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, common.NewResponse("removed skill", nil))
+		c.JSON(http.StatusOK, common.NewResponse("", users))
 	}
 }

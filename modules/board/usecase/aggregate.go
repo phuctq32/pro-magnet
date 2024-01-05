@@ -8,6 +8,7 @@ import (
 	camodel "pro-magnet/modules/cardattachment/model"
 	columnmodel "pro-magnet/modules/column/model"
 	labelmodel "pro-magnet/modules/label/model"
+	usermodel "pro-magnet/modules/user/model"
 	"time"
 )
 
@@ -27,12 +28,22 @@ type ColumnRepo interface {
 	FindByBoardId(ctx context.Context, status columnmodel.ColumnStatus, boardId string, columnIdsOrder []string) ([]columnmodel.Column, error)
 }
 
+type BoardMemberRepo interface {
+	FindMemberIdsByBoardId(ctx context.Context, boardId string) ([]string, error)
+}
+
+type UserRepo interface {
+	FindSimpleUsersByIds(ctx context.Context, userIds []string) ([]usermodel.User, error)
+}
+
 type boardAggregator struct {
 	asyncg               asyncgroup.AsyncGroup
 	colRepo              ColumnRepo
 	cardRepo             CardRepo
 	caRepo               CardAttachmentRepo
 	labelRepo            LabelRepo
+	bmRepo               BoardMemberRepo
+	userRepo             UserRepo
 	labelMap             map[string]labelmodel.Label
 	getBoardLabelsDoneCh chan bool
 }
@@ -43,6 +54,8 @@ func NewBoardAggregator(
 	cardRepo CardRepo,
 	caRepo CardAttachmentRepo,
 	labelRepo LabelRepo,
+	bmRepo BoardMemberRepo,
+	userRepo UserRepo,
 ) *boardAggregator {
 	return &boardAggregator{
 		asyncg:               asyncg,
@@ -50,6 +63,8 @@ func NewBoardAggregator(
 		cardRepo:             cardRepo,
 		caRepo:               caRepo,
 		labelRepo:            labelRepo,
+		bmRepo:               bmRepo,
+		userRepo:             userRepo,
 		labelMap:             make(map[string]labelmodel.Label),
 		getBoardLabelsDoneCh: make(chan bool, 1),
 	}
@@ -59,6 +74,7 @@ func (ba *boardAggregator) Aggregate(ctx context.Context, board *boardmodel.Boar
 	return ba.asyncg.ProcessWithTimeout(
 		ctx,
 		time.Second*10,
+		ba.aggregateMembers(board),
 		ba.aggregateLabels(board),
 		ba.aggregateColumns(board),
 	)
@@ -75,6 +91,24 @@ func (ba *boardAggregator) aggregateLabels(board *boardmodel.Board) func(context
 			ba.labelMap[*labels[i].Id] = labels[i]
 		}
 		ba.getBoardLabelsDoneCh <- true
+
+		return nil
+	}
+}
+
+func (ba *boardAggregator) aggregateMembers(board *boardmodel.Board) func(context.Context) error {
+	return func(ctx context.Context) error {
+		memberIds, err := ba.bmRepo.FindMemberIdsByBoardId(ctx, *board.Id)
+		if err != nil {
+			return err
+		}
+
+		members, err := ba.userRepo.FindSimpleUsersByIds(ctx, memberIds)
+		if err != nil {
+			return err
+		}
+
+		board.Members = members
 
 		return nil
 	}

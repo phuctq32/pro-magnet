@@ -11,6 +11,8 @@ import (
 	carepo "pro-magnet/modules/cardattachment/repository/mongo"
 	columnrepo "pro-magnet/modules/column/repository/mongo"
 	labelrepo "pro-magnet/modules/label/repository/mongo"
+	recomapi "pro-magnet/modules/recommendation/transport/api"
+	recomuc "pro-magnet/modules/recommendation/usecase"
 	userrepo "pro-magnet/modules/user/repository/mongo"
 )
 
@@ -24,6 +26,9 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	cardDataAggregator := carduc.NewCardDataAggregator(appCtx.AsyncGroup(), caRepo, userRepo, labelRepo)
 	cardUC := carduc.NewCardUseCase(cardRepo, colRepo, bmRepo, labelRepo, cardDataAggregator)
 	cardHdl := cardapi.NewCardHandler(cardUC)
+
+	recomUC := recomuc.NewRecommendationUseCase(userRepo, cardRepo)
+	recomHdl := recomapi.NewRecommendationHandler(recomUC)
 
 	cardRouter := router.Group("/cards", middlewares.Authorize(appCtx))
 	{
@@ -40,7 +45,9 @@ func NewCardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 
 		cardRouter.POST("/:cardId/labels", cardHdl.AddLabelToCard(appCtx))
 
-		cardRouter.POST("/:cardId/skills", cardHdl.AddSkills(appCtx))
-		cardRouter.DELETE("/:cardId/skills", cardHdl.RemoveSkill(appCtx))
+		cardRouter.PATCH("/:cardId/skills", cardHdl.UpdateSkills(appCtx))
+
+		cardRouter.GET("/:cardId/recommended-users", recomHdl.GetRecommendedUsersForCard(appCtx))
 	}
+
 }

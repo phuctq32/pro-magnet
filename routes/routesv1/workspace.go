@@ -5,6 +5,7 @@ import (
 	"pro-magnet/components/appcontext"
 	"pro-magnet/middlewares"
 	boardrepo "pro-magnet/modules/board/repository/mongo"
+	boardmemberrepo "pro-magnet/modules/boardmember/repository/mongo"
 	userrepo "pro-magnet/modules/user/repository/mongo"
 	"pro-magnet/modules/workspace/repository/mongo"
 	"pro-magnet/modules/workspace/transport/api"
@@ -19,7 +20,8 @@ func NewWorkspaceRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	wsMemberRepo := wsmemberrepo.NewWorkspaceMemberRepository(appCtx.DBConnection())
 	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
 	boardRepo := boardrepo.NewBoardRepository(appCtx.DBConnection())
-	wsAgg := wsuc.NewWorkspaceAggregator(appCtx.AsyncGroup(), userRepo, wsMemberRepo, boardRepo)
+	bmRepo := boardmemberrepo.NewBoardMemberRepository(appCtx.DBConnection())
+	wsAgg := wsuc.NewWorkspaceAggregator(appCtx.AsyncGroup(), userRepo, wsMemberRepo, boardRepo, bmRepo)
 	wsUC := wsuc.NewWorkspaceUseCase(wsRepo, wsMemberRepo, wsAgg)
 	wsHdl := wsapi.NewWorkspaceHandler(wsUC)
 

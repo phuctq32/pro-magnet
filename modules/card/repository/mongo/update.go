@@ -199,26 +199,7 @@ func (repo *cardRepository) UpdateSkills(
 		UpdateOne(
 			ctx,
 			bson.M{"_id": cardOid},
-			bson.M{"$push": bson.M{"skills": bson.M{"$each": skills}}},
-		)
-
-	return err
-}
-
-func (repo *cardRepository) RemoveSkill(
-	ctx context.Context,
-	cardId, skill string,
-) error {
-	cardOid, err := primitive.ObjectIDFromHex(cardId)
-	if err != nil {
-		return common.NewBadRequestErr(errors.New("invalid objectId"))
-	}
-
-	_, err = repo.db.Collection(cardmodel.CardCollectionName).
-		UpdateOne(
-			ctx,
-			bson.M{"_id": cardOid},
-			bson.M{"$pull": bson.M{"skills": skill}},
+			bson.M{"$set": bson.M{"skills": skills}},
 		)
 
 	return err

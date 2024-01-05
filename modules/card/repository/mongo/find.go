@@ -9,6 +9,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"pro-magnet/common"
 	cardmodel "pro-magnet/modules/card/model"
+	"time"
 )
 
 func (repo *cardRepository) FindOne(
@@ -141,4 +142,85 @@ func (repo *cardRepository) FindByColumnId(
 	}
 
 	return cards, err
+}
+
+func (repo *cardRepository) CountNumberOfSkillsMatchedOfEachCardDoneByUser(
+	ctx context.Context, userId string, skills []string,
+) ([]int, error) {
+	userOid, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+	aggPipeline := bson.A{
+		bson.M{"$match": bson.M{
+			"isDone":    true,
+			"memberIds": userOid,
+			"skills":    bson.M{"$in": skills},
+		}},
+		bson.M{"$project": bson.M{
+			"_id": 0,
+			"matchedSkillCount": bson.M{
+				"$size": bson.M{
+					"$filter": bson.M{
+						"input": "$skills",
+						"as":    "skill",
+						"cond":  bson.M{"$in": bson.A{"$$skill", skills}},
+					},
+				},
+			},
+		}},
+	}
+
+	cursor, err := repo.db.Collection(cardmodel.CardCollectionName).Aggregate(ctx, aggPipeline)
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	data := make([]struct {
+		MatchedSkillCount int `bson:"matchedSkillCount,omitempty"`
+	}, 0)
+	if err = cursor.All(ctx, &data); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	result := make([]int, len(data))
+	for i := 0; i < len(data); i++ {
+		result[i] = data[i].MatchedSkillCount
+	}
+
+	return result, nil
+}
+
+func (repo *cardRepository) CountCardInSamePeriodNotDoneByUser(
+	ctx context.Context, userId string,
+	startDate, endDate time.Time,
+) (int, error) {
+	userOid, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return 0, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	count, err := repo.db.
+		Collection(cardmodel.CardCollectionName).
+		CountDocuments(ctx, bson.M{"$and": bson.A{
+			bson.M{"isDone": false},
+			bson.M{"memberIds": userOid},
+			bson.M{"startDate": bson.M{"$ne": nil}},
+			bson.M{"endDate": bson.M{"$ne": nil}},
+			bson.M{"$or": bson.A{
+				bson.M{"$and": bson.A{
+					bson.M{"startDate": bson.M{"$gte": startDate}},
+					bson.M{"startDate": bson.M{"$lt": endDate}},
+				}},
+				bson.M{"$and": bson.A{
+					bson.M{"endDate": bson.M{"$gt": startDate}},
+					bson.M{"endDate": bson.M{"$lte": endDate}},
+				}},
+			}},
+		}})
+	if err != nil {
+		return 0, common.NewServerErr(err)
+	}
+
+	return int(count), nil
 }

@@ -25,6 +25,9 @@ type User struct {
 	Birthday    *time.Time `json:"birthday,omitempty" bson:"birthday,omitempty"`
 	Type        *UserType  `json:"type,omitempty" bson:"type,omitempty"`
 	Skills      []string   `json:"skills,omitempty" bson:"skills,omitempty"`
+
+	// Other fields
+	SkillScore float32 `json:"-" bson:"-"`
 }
 
 func (u *User) UserId() string {

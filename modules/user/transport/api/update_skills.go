@@ -7,7 +7,7 @@ import (
 	"pro-magnet/components/appcontext"
 )
 
-func (hdl *userHandler) AddSkills(appCtx appcontext.AppContext) gin.HandlerFunc {
+func (hdl *userHandler) UpdateSkills(appCtx appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requesterId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
 
@@ -23,10 +23,10 @@ func (hdl *userHandler) AddSkills(appCtx appcontext.AppContext) gin.HandlerFunc 
 			panic(common.NewValidationErrors(errs))
 		}
 
-		if err := hdl.uc.AddSkils(c.Request.Context(), requesterId, data.Skills); err != nil {
+		if err := hdl.uc.UpdateSkills(c.Request.Context(), requesterId, data.Skills); err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, common.NewResponse("added user skills", nil))
+		c.JSON(http.StatusOK, common.NewResponse("updated user skills", nil))
 	}
 }

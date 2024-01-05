@@ -8,13 +8,13 @@ import (
 	"strings"
 )
 
-func (hdl *cardHandler) AddSkills(appCtx appcontext.AppContext) gin.HandlerFunc {
+func (hdl *cardHandler) UpdateSkills(appCtx appcontext.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		requesterId := c.MustGet(common.RequesterKey).(common.Requester).UserId()
 
 		data := struct {
 			CardId string   `json:"cardId" validate:"required,mongodb"`
-			Skills []string `json:"skills" validate:"required,min=1,dive,required"`
+			Skills []string `json:"skills" validate:"required,dive,required"`
 		}{
 			CardId: strings.TrimSpace(c.Param("cardId")),
 		}
@@ -27,10 +27,10 @@ func (hdl *cardHandler) AddSkills(appCtx appcontext.AppContext) gin.HandlerFunc 
 			panic(common.NewValidationErrors(errs))
 		}
 
-		if err := hdl.uc.AddSkils(c.Request.Context(), requesterId, data.CardId, data.Skills); err != nil {
+		if err := hdl.uc.UpdateSkills(c.Request.Context(), requesterId, data.CardId, data.Skills); err != nil {
 			panic(err)
 		}
 
-		c.JSON(http.StatusOK, common.NewResponse("added card skills", nil))
+		c.JSON(http.StatusOK, common.NewResponse("updated card skills", nil))
 	}
 }
