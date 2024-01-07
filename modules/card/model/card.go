@@ -28,6 +28,7 @@ type Card struct {
 	StartDate   *time.Time                         `json:"startDate,omitempty" bson:"startDate,omitempty"`
 	EndDate     *time.Time                         `json:"endDate,omitempty" bson:"endDate,omitempty"`
 	IsDone      bool                               `json:"isDone" bson:"isDone"`
+	Skills      []string                           `json:"skills,omitempty" bson:"skills,omitempty"`
 
 	// Aggregated data
 	Members         []usermodel.User         `json:"members,omitempty"`

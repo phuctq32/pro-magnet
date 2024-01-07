@@ -58,7 +58,7 @@ func (repo *labelRepository) FindByBoardId(
 		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
 	}
 
-	return repo.Find(ctx, labelStatus, map[string]interface{}{
-		"boardId": boardOid,
-	})
+	filter := map[string]interface{}{"boardId": boardOid}
+
+	return repo.Find(ctx, labelStatus, filter)
 }

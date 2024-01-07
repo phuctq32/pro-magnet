@@ -186,6 +186,25 @@ func (repo *cardRepository) RemoveLabelFromCardsByIds(
 	return err
 }
 
+func (repo *cardRepository) UpdateSkills(
+	ctx context.Context,
+	cardId string, skills []string,
+) error {
+	cardOid, err := primitive.ObjectIDFromHex(cardId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	_, err = repo.db.Collection(cardmodel.CardCollectionName).
+		UpdateOne(
+			ctx,
+			bson.M{"_id": cardOid},
+			bson.M{"$set": bson.M{"skills": skills}},
+		)
+
+	return err
+}
+
 func (repo *cardRepository) UpdateOne(
 	ctx context.Context,
 	filter map[string]interface{},

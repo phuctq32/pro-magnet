@@ -19,4 +19,5 @@ func Setup(appCtx appcontext.AppContext, engine *gin.Engine) {
 	routesv1.NewCardChecklistRouter(appCtx, v1)
 	routesv1.NewCardCommentRouter(appCtx, v1)
 	routesv1.NewCardAttachmentRouter(appCtx, v1)
+	routesv1.NewSearchRouter(appCtx, v1)
 }

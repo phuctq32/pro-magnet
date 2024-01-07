@@ -11,6 +11,25 @@ import (
 	usermodel "pro-magnet/modules/user/model"
 )
 
+func (repo *userRepository) UpdateSkills(
+	ctx context.Context,
+	userId string, skills []string,
+) error {
+	userOid, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		return common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	_, err = repo.db.Collection(usermodel.UserCollectionName).
+		UpdateOne(
+			ctx,
+			bson.M{"_id": userOid},
+			bson.M{"$set": bson.M{"skills": skills}},
+		)
+
+	return err
+}
+
 func (repo *userRepository) UpdateById(
 	ctx context.Context,
 	id string,

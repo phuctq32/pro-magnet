@@ -35,6 +35,7 @@ func (uc *authUseCase) Register(ctx context.Context, data *authmodel.RegisterUse
 		Avatar:      authmodel.DefaultAvatarUrl,
 		PhoneNumber: &data.PhoneNumber,
 		Birthday:    &data.Birthday,
+		Skills:      make([]string, 0),
 	}
 	userType := usermodel.InternalUser
 	newUser.Type = &userType

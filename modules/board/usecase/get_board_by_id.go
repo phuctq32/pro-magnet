@@ -10,6 +10,7 @@ import (
 func (uc *boardUseCase) GetBoardById(
 	ctx context.Context,
 	requesterId, boardId string,
+	labelIds []string,
 ) (*boardmodel.Board, error) {
 	board, err := uc.boardRepo.FindById(ctx, boardId)
 	if err != nil {
@@ -25,6 +26,9 @@ func (uc *boardUseCase) GetBoardById(
 	if !isBoardMember {
 		return nil, common.NewBadRequestErr(bmmodel.ErrUserNotBoardMember)
 	}
+
+	board.FilteredLabelIds = labelIds
+	// Check if labels are existed in board
 
 	if err = uc.boardAgg.Aggregate(ctx, board); err != nil {
 		return nil, err

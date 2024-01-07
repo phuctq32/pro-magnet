@@ -21,7 +21,7 @@ func (uc *workspaceUseCase) GetWorkspaceById(
 		return nil, err
 	}
 
-	if requesterId != ws.OwnerUserId || !isWsMember {
+	if !isWsMember {
 		return nil, common.NewBadRequestErr(wsmembermodel.ErrUserNotWorkspaceMember)
 	}
 

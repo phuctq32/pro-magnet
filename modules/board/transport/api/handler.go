@@ -8,7 +8,7 @@ import (
 type BoardUseCase interface {
 	CreateBoard(ctx context.Context, data *boardmodel.BoardCreation) (*boardmodel.Board, error)
 	UpdateBoard(ctx context.Context, requesterId, boardId string, updateData *boardmodel.BoardUpdate) error
-	GetBoardById(ctx context.Context, requesterId, boardId string) (board *boardmodel.Board, err error)
+	GetBoardById(ctx context.Context, requesterId, boardId string, labelIds []string) (board *boardmodel.Board, err error)
 }
 
 type boardHandler struct {

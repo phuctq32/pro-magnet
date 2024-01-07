@@ -30,6 +30,8 @@ func NewUserRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		userRouter.GET("/me", userHdl.GetProfile(appCtx))
 		userRouter.PATCH("/me/change-password", userHdl.ChangePassword(appCtx))
 
+		userRouter.PATCH("/me/skills", userHdl.UpdateSkills(appCtx))
+
 		userRouter.GET("/to-add-to-card", userHdl.GetUsersToAddToCard(appCtx))
 		userRouter.GET("/to-add-to-workspace", userHdl.GetUsersByEmailToAddToWorkspace(appCtx))
 	}

@@ -4,6 +4,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	columnmodel "pro-magnet/modules/column/model"
 	labelmodel "pro-magnet/modules/label/model"
+	usermodel "pro-magnet/modules/user/model"
 	"time"
 )
 
@@ -28,6 +29,8 @@ type Board struct {
 	OrderedColumnIds []string    `json:"orderedColumnIds" bson:"orderedColumnIds"`
 
 	// Aggregated data
-	Labels  []labelmodel.Label   `json:"labels,omitempty" bson:"-"`
-	Columns []columnmodel.Column `json:"columns,omitempty" bson:"-"`
+	Labels           []labelmodel.Label   `json:"labels,omitempty" bson:"-"`
+	FilteredLabelIds []string             `json:"filteredLabelIds,omitempty" bson:"-"`
+	Columns          []columnmodel.Column `json:"columns,omitempty" bson:"-"`
+	Members          []usermodel.User     `json:"members,omitempty" bson:"-"`
 }

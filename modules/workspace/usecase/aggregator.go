@@ -20,11 +20,16 @@ type BoardRepo interface {
 	FindByWorkspaceId(ctx context.Context, status boardmodel.BoardStatus, workspaceId string) ([]boardmodel.Board, error)
 }
 
+type BoardMemberRepo interface {
+	FindMemberIdsByBoardId(ctx context.Context, boardId string) ([]string, error)
+}
+
 type wsAggregator struct {
 	asyncg       asyncgroup.AsyncGroup
 	userRepo     UserRepo
 	wsMemberRepo WorkspaceMemberRepo
 	boardRepo    BoardRepo
+	bmRepo       BoardMemberRepo
 }
 
 func NewWorkspaceAggregator(
@@ -32,12 +37,14 @@ func NewWorkspaceAggregator(
 	userRepo UserRepo,
 	wsMemberRepo WorkspaceMemberRepo,
 	boardRepo BoardRepo,
+	bmRepo BoardMemberRepo,
 ) *wsAggregator {
 	return &wsAggregator{
 		asyncg:       asyncg,
 		userRepo:     userRepo,
 		wsMemberRepo: wsMemberRepo,
 		boardRepo:    boardRepo,
+		bmRepo:       bmRepo,
 	}
 }
 
@@ -82,8 +89,21 @@ func (wa *wsAggregator) aggregateBoards(ws *wsmodel.Workspace) func(ctx context.
 			return err
 		}
 
-		ws.Boards = boards
+		for i := 0; i < len(boards); i++ {
+			memberIds, err := wa.bmRepo.FindMemberIdsByBoardId(ctx, *boards[i].Id)
+			if err != nil {
+				return err
+			}
 
+			members, err := wa.userRepo.FindSimpleUsersByIds(ctx, memberIds)
+			if err != nil {
+				return err
+			}
+
+			boards[i].Members = members
+		}
+
+		ws.Boards = boards
 		return nil
 	}
 }

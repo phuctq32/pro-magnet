@@ -29,6 +29,7 @@ type CardInsert struct {
 	StartDate   *time.Time                         `bson:"startDate,omitempty"`
 	EndDate     *time.Time                         `bson:"endDate,omitempty"`
 	IsDone      bool                               `bson:"isDone"`
+	Skills      []string                           `bson:"skills"`
 }
 
 func (cc *CardCreation) ToCardInsert() (*CardInsert, error) {
@@ -59,5 +60,6 @@ func (cc *CardCreation) ToCardInsert() (*CardInsert, error) {
 		StartDate:   nil,
 		EndDate:     nil,
 		IsDone:      false,
+		Skills:      make([]string, 0),
 	}, nil
 }

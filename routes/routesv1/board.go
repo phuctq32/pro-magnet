@@ -27,7 +27,8 @@ func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 	cardRepo := mongo.NewCardRepository(appCtx.DBConnection())
 	caRepo := carepo.NewCardAttachmentRepository(appCtx.DBConnection())
 	labelRepo := labelrepo.NewLabelRepository(appCtx.DBConnection())
-	boardAgg := boarduc.NewBoardAggregator(appCtx.AsyncGroup(), colRepo, cardRepo, caRepo, labelRepo)
+	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
+	boardAgg := boarduc.NewBoardAggregator(appCtx.AsyncGroup(), colRepo, cardRepo, caRepo, labelRepo, bmRepo, userRepo)
 
 	boardUC := boarduc.NewBoardUseCase(boardRepo, bmRepo, wsMemberRepo, boardAgg, appCtx.AsyncGroup())
 
@@ -40,7 +41,6 @@ func NewBoardRouter(appCtx appcontext.AppContext, router *gin.RouterGroup) {
 		boardRouter.GET("/:boardId", boardHdl.GetBoardById(appCtx))
 	}
 
-	userRepo := userrepo.NewUserRepository(appCtx.DBConnection())
 	bmUC := bmuc.NewBoardMemberUseCase(bmRepo, boardRepo, userRepo, appCtx.AsyncGroup())
 	bmHdl := bmapi.NewBoardMemberHandler(bmUC)
 
