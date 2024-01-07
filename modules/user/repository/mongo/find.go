@@ -84,6 +84,7 @@ func (repo *userRepository) FindUsersByMatchingAtLeastOneCardSkills(
 		bson.M{"$project": bson.M{
 			"_id":    1,
 			"email":  1,
+			"name":   1,
 			"avatar": 1,
 			"skills": 1,
 		}},

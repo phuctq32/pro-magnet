@@ -17,12 +17,25 @@ func (hdl *boardHandler) GetBoardById(appCtx appcontext.AppContext) gin.HandlerF
 		}{
 			BoardId: strings.TrimSpace(c.Param("boardId")),
 		}
-
 		if errs := appCtx.Validator().Validate(&data); errs != nil {
 			panic(common.NewValidationErrors(errs))
 		}
 
-		board, err := hdl.uc.GetBoardById(c.Request.Context(), requesterId, data.BoardId)
+		labelIdsData := struct {
+			LabelIds []string `json:"labelIds" validate:"required,dive,mongodb"`
+		}{
+			LabelIds: c.QueryArray("labelIds"),
+		}
+
+		if len(labelIdsData.LabelIds) > 0 {
+			if errs := appCtx.Validator().Validate(&labelIdsData); errs != nil {
+				panic(common.NewValidationErrors(errs))
+			}
+		} else {
+			labelIdsData.LabelIds = nil
+		}
+
+		board, err := hdl.uc.GetBoardById(c.Request.Context(), requesterId, data.BoardId, labelIdsData.LabelIds)
 		if err != nil {
 			panic(err)
 		}

@@ -82,3 +82,42 @@ func (repo *wsRepository) FindByName(
 ) (*wsmodel.Workspace, error) {
 	return repo.FindOne(ctx, map[string]interface{}{"name": name})
 }
+
+func (repo *wsRepository) Search(
+	ctx context.Context,
+	memberId, searchTerm string,
+) ([]wsmodel.Workspace, error) {
+	memberOid, err := primitive.ObjectIDFromHex(memberId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	aggPipeline := bson.A{
+		bson.M{"$lookup": bson.M{
+			"from":         "workspace_members",
+			"foreignField": "workspaceId",
+			"localField":   "_id",
+			"as":           "wsMembers",
+		}},
+		bson.M{"$unwind": "$wsMembers"},
+		bson.M{"$match": bson.M{
+			"wsMembers.userId": memberOid,
+			"name": primitive.Regex{
+				Pattern: searchTerm,
+				Options: "i",
+			},
+		}},
+	}
+
+	cursor, err := repo.db.Collection(wsmodel.WsCollectionName).Aggregate(ctx, aggPipeline)
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	result := make([]wsmodel.Workspace, 0)
+	if err = cursor.All(ctx, &result); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	return result, nil
+}

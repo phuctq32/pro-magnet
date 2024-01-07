@@ -2,6 +2,7 @@ package boardrepo
 
 import (
 	"github.com/pkg/errors"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/net/context"
@@ -72,4 +73,44 @@ func (repo *boardRepository) FindByWorkspaceId(
 	}
 
 	return repo.Find(ctx, status, map[string]interface{}{"workspaceId": wsOid})
+}
+
+func (repo *boardRepository) Search(
+	ctx context.Context,
+	memberId, searchTerm string,
+) ([]boardmodel.Board, error) {
+	memberOid, err := primitive.ObjectIDFromHex(memberId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	aggPipeline := bson.A{
+		bson.M{"$lookup": bson.M{
+			"from":         "board_members",
+			"foreignField": "boardId",
+			"localField":   "_id",
+			"as":           "boardMembers",
+		}},
+		bson.M{"$unwind": "$boardMembers"},
+		bson.M{"$match": bson.M{
+			"boardMembers.userId": memberOid,
+			"status":              boardmodel.Active,
+			"name": primitive.Regex{
+				Pattern: searchTerm,
+				Options: "i",
+			},
+		}},
+	}
+
+	cursor, err := repo.db.Collection(boardmodel.BoardCollectionName).Aggregate(ctx, aggPipeline)
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	result := make([]boardmodel.Board, 0)
+	if err = cursor.All(ctx, &result); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	return result, nil
 }

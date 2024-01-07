@@ -9,6 +9,7 @@ func (uc *searchUseCase) Search(
 	ctx context.Context,
 	requesterId, searchTerm string,
 ) (data *searchmodel.SearchData, err error) {
+	data = new(searchmodel.SearchData)
 	err = uc.asyncg.Process(
 		ctx,
 		uc.searchWorkspaces(data, requesterId, searchTerm),

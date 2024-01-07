@@ -13,7 +13,7 @@ import (
 )
 
 type CardRepo interface {
-	FindByColumnId(ctx context.Context, cardStatus cardmodel.CardStatus, columnId string, cardIdsOrder []string) ([]cardmodel.Card, error)
+	FindByColumnId(ctx context.Context, cardStatus cardmodel.CardStatus, columnId string, cardIdsOrder []string, labelIds []string) ([]cardmodel.Card, error)
 }
 
 type CardAttachmentRepo interface {
@@ -70,17 +70,27 @@ func NewBoardAggregator(
 	}
 }
 
-func (ba *boardAggregator) Aggregate(ctx context.Context, board *boardmodel.Board) error {
+func (ba *boardAggregator) Aggregate(
+	ctx context.Context,
+	board *boardmodel.Board,
+) error {
+	labelMap := make(map[string]labelmodel.Label)
+	getBoardLabelsDoneCh := make(chan bool, 1)
+	defer close(getBoardLabelsDoneCh)
 	return ba.asyncg.ProcessWithTimeout(
 		ctx,
 		time.Second*10,
 		ba.aggregateMembers(board),
-		ba.aggregateLabels(board),
-		ba.aggregateColumns(board),
+		ba.aggregateLabels(board, labelMap, getBoardLabelsDoneCh),
+		ba.aggregateColumns(board, getBoardLabelsDoneCh),
 	)
 }
 
-func (ba *boardAggregator) aggregateLabels(board *boardmodel.Board) func(context.Context) error {
+func (ba *boardAggregator) aggregateLabels(
+	board *boardmodel.Board,
+	labelMap map[string]labelmodel.Label,
+	getBoardLabelsDoneCh chan<- bool,
+) func(context.Context) error {
 	return func(ctx context.Context) error {
 		labels, err := ba.labelRepo.FindByBoardId(ctx, labelmodel.Active, *board.Id)
 		if err != nil {
@@ -88,9 +98,9 @@ func (ba *boardAggregator) aggregateLabels(board *boardmodel.Board) func(context
 		}
 		board.Labels = labels
 		for i := 0; i < len(labels); i++ {
-			ba.labelMap[*labels[i].Id] = labels[i]
+			labelMap[*labels[i].Id] = labels[i]
 		}
-		ba.getBoardLabelsDoneCh <- true
+		getBoardLabelsDoneCh <- true
 
 		return nil
 	}
@@ -114,7 +124,10 @@ func (ba *boardAggregator) aggregateMembers(board *boardmodel.Board) func(contex
 	}
 }
 
-func (ba *boardAggregator) aggregateColumns(board *boardmodel.Board) func(context.Context) error {
+func (ba *boardAggregator) aggregateColumns(
+	board *boardmodel.Board,
+	getBoardLabelsDoneCh <-chan bool,
+) func(context.Context) error {
 	return func(ctx context.Context) error {
 		cols, err := ba.colRepo.FindByBoardId(ctx, columnmodel.Active, *board.Id, board.OrderedColumnIds)
 		if err != nil {
@@ -123,19 +136,31 @@ func (ba *boardAggregator) aggregateColumns(board *boardmodel.Board) func(contex
 		board.Columns = cols
 
 		// wait for get labels task done
-		<-ba.getBoardLabelsDoneCh
+		<-getBoardLabelsDoneCh
 		aggColumnTasks := make([]func(context.Context) error, 0)
 		for i := 0; i < len(board.Columns); i++ {
-			aggColumnTasks = append(aggColumnTasks, ba.aggregateCards(&board.Columns[i]))
+			aggColumnTasks = append(aggColumnTasks, ba.aggregateCards(&board.Columns[i], board.FilteredLabelIds))
 		}
 
-		return ba.asyncg.Process(ctx, aggColumnTasks...)
+		if err = ba.asyncg.Process(ctx, aggColumnTasks...); err != nil {
+			return err
+		}
+
+		//if len(labelIds) > 0 {
+		//	for i := 0; i < len(board.Columns); i++ {
+		//		if len(board.Columns[i].Cards) == 0 {
+		//			board.Columns = append(board.Columns[:i], board.Columns[i+1:]...)
+		//		}
+		//	}
+		//}
+
+		return nil
 	}
 }
 
-func (ba *boardAggregator) aggregateCards(col *columnmodel.Column) func(context.Context) error {
+func (ba *boardAggregator) aggregateCards(col *columnmodel.Column, labelIds []string) func(context.Context) error {
 	return func(ctx context.Context) error {
-		cards, err := ba.cardRepo.FindByColumnId(ctx, cardmodel.Active, *col.Id, col.OrderedCardIds)
+		cards, err := ba.cardRepo.FindByColumnId(ctx, cardmodel.Active, *col.Id, col.OrderedCardIds, labelIds)
 		if err != nil {
 			return err
 		}

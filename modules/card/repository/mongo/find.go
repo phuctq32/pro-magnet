@@ -84,6 +84,7 @@ func (repo *cardRepository) FindByColumnId(
 	status cardmodel.CardStatus,
 	columnId string,
 	cardIdsOrder []string,
+	labelIds []string,
 ) ([]cardmodel.Card, error) {
 	columnOid, err := primitive.ObjectIDFromHex(columnId)
 	if err != nil {
@@ -98,13 +99,25 @@ func (repo *cardRepository) FindByColumnId(
 		cardOids = append(cardOids, oid)
 	}
 
+	andOp := bson.A{
+		bson.M{"columnId": columnOid},
+		bson.M{"status": status},
+	}
+	if labelIds != nil || len(labelIds) > 0 {
+		labelOids := make([]primitive.ObjectID, 0)
+		for _, id := range labelIds {
+			oid, err := primitive.ObjectIDFromHex(id)
+			if err != nil {
+				return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+			}
+			labelOids = append(labelOids, oid)
+		}
+
+		andOp = append(andOp, bson.M{"labelIds": bson.M{"$in": labelOids}})
+	}
+
 	aggPipeline := bson.A{
-		bson.M{"$match": bson.M{
-			"$and": bson.A{
-				bson.M{"columnId": columnOid},
-				bson.M{"status": status},
-			},
-		}},
+		bson.M{"$match": bson.M{"$and": andOp}},
 		bson.M{"$addFields": bson.M{
 			"memberCount":   bson.M{"$size": "$memberIds"},
 			"commentCount":  bson.M{"$size": "$comments"},
@@ -223,4 +236,66 @@ func (repo *cardRepository) CountCardInSamePeriodNotDoneByUser(
 	}
 
 	return int(count), nil
+}
+
+func (repo *cardRepository) Search(
+	ctx context.Context,
+	memberId, searchTerm string,
+) ([]cardmodel.Card, error) {
+	memberOid, err := primitive.ObjectIDFromHex(memberId)
+	if err != nil {
+		return nil, common.NewBadRequestErr(errors.New("invalid objectId"))
+	}
+
+	aggPipeline := bson.A{
+		bson.M{"$lookup": bson.M{
+			"from":         "board_members",
+			"foreignField": "boardId",
+			"localField":   "boardId",
+			"as":           "boardMembers",
+		}},
+		bson.M{"$unwind": "$boardMembers"},
+		bson.M{"$match": bson.M{
+			"boardMembers.userId": memberOid,
+			"status":              cardmodel.Active,
+			"title": primitive.Regex{
+				Pattern: searchTerm,
+				Options: "i",
+			},
+		}},
+		bson.M{"$addFields": bson.M{
+			"memberCount":  bson.M{"$size": "$memberIds"},
+			"commentCount": bson.M{"$size": "$comments"},
+		}},
+		bson.M{"$project": bson.M{
+			"_id":          1,
+			"boardId":      1,
+			"title":        1,
+			"cover":        1,
+			"labelIds":     1,
+			"startDate":    1,
+			"endDate":      1,
+			"isDone":       1,
+			"memberCount":  1,
+			"commentCount": 1,
+		}},
+	}
+
+	cursor, err := repo.db.
+		Collection(cardmodel.CardCollectionName).
+		Aggregate(ctx, aggPipeline)
+	if err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	cards := make([]cardmodel.Card, 0)
+	if err = cursor.All(ctx, &cards); err != nil {
+		return nil, common.NewServerErr(err)
+	}
+
+	if cards == nil {
+		return []cardmodel.Card{}, nil
+	}
+
+	return cards, err
 }

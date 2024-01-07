@@ -24,7 +24,11 @@ func (uc *recomUseCase) GetRecommendedUsersForCard(
 			return common.NewBadRequestErr(cardmodel.ErrCardDeleted)
 		}
 		if card.IsDone {
-			return common.NewBadRequestErr(errors.New("cannot recommend user for card is done"))
+			return common.NewBadRequestErr(errors.New("cannot recommend users for card is done"))
+		}
+		if card.Skills == nil || len(card.Skills) == 0 {
+			users = make([]usermodel.User, 0)
+			return nil
 		}
 
 		requiredSkillMap := make(map[string]bool)
@@ -79,6 +83,9 @@ func (uc *recomUseCase) GetRecommendedUsersForCard(
 
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	sort.Slice(users, func(i, j int) bool {
 		return users[i].SkillScore > users[j].SkillScore

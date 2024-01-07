@@ -29,6 +29,6 @@ type Workspace struct {
 	Image       string    `json:"image" bson:"image"`
 
 	// Aggregated data
-	Boards  []boardmodel.Board `json:"boards"`
-	Members []usermodel.User   `json:"members"`
+	Boards  []boardmodel.Board `json:"boards,omitempty"`
+	Members []usermodel.User   `json:"members,omitempty"`
 }

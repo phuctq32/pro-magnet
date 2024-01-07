@@ -38,6 +38,6 @@ func (repo *cardRepository) Create(
 		StartDate:  nil,
 		EndDate:    nil,
 		IsDone:     false,
-		Skills:     make([]string, 0),
+		Skills:     []string{},
 	}, nil
 }
